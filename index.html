@@ -444,6 +444,13 @@ input:focus,select:focus,textarea:focus{ border-color:var(--foil); outline:none;
 textarea{ resize:vertical; min-height:96px; }
 .form-note{ font-size:.78rem; color:var(--muted); margin-top:14px; }
 .form-msg{ margin-top:14px; font-family:var(--f-mono); font-size:.78rem; color:var(--holo); }
+.form-fallback{
+  margin-top:16px; padding:18px; border:1px dashed var(--edge);
+  border-radius:var(--r-sm); background:rgba(255,255,255,.02);
+}
+.fb__t{ font-size:.86rem; color:var(--muted); margin-bottom:12px; }
+.fb__t a{ color:var(--foil); }
+.fb__box{ font-family:var(--f-mono); font-size:.8rem; margin-bottom:12px; }
 
 /* ============================================================
    FAQ
@@ -792,12 +799,16 @@ details p{ color:var(--muted); font-size:.94rem; padding-bottom:22px; max-width:
             <input id="nombre" name="nombre" required>
           </div>
           <div>
-            <label for="contacto" data-es="Email o WhatsApp" data-en="Email or WhatsApp">Email o WhatsApp</label>
-            <input id="contacto" name="contacto" required data-es-ph="Para responderte" data-en-ph="So we can reply" placeholder="Para responderte">
+            <label for="contacto" data-es="Tu email" data-en="Your email">Tu email</label>
+            <input id="contacto" name="contacto" type="email" required data-es-ph="Para responderte" data-en-ph="So we can reply" placeholder="Para responderte">
           </div>
           <div class="f-full">
             <label for="notas" data-es="Detalles (zona preferida, flexibilidad de fecha…)" data-en="Details (preferred section, date flexibility…)">Detalles (zona preferida, flexibilidad de fecha…)</label>
             <textarea id="notas" name="notas"></textarea>
+          </div>
+          <div class="f-full" aria-hidden="true" style="position:absolute;left:-9999px">
+            <label for="empresa">Empresa</label>
+            <input id="empresa" name="empresa" tabindex="-1" autocomplete="off">
           </div>
           <div class="f-full">
             <button class="btn btn--gold btn--block" type="submit" data-es="Enviar solicitud" data-en="Send request">Enviar solicitud</button>
@@ -809,6 +820,7 @@ details p{ color:var(--muted); font-size:.94rem; padding-bottom:22px; max-width:
           Usamos tus datos solo para responder a esta solicitud. Nunca pedimos el pago antes de confirmar disponibilidad.
         </p>
         <p class="form-msg" id="formMsg" hidden></p>
+        <div class="form-fallback" id="formFallback" hidden></div>
       </form>
     </div>
   </div>
@@ -1115,7 +1127,28 @@ const DATOS = {
   /* --- Destino del formulario --- */
   // Crea un formulario gratis en formspree.io y pega aquí tu endpoint.
   // Si lo dejas vacío, el botón abre el correo del usuario con todo relleno.
-  formEndpoint: "",
+  /* ─── A DÓNDE VA EL FORMULARIO ────────────────────────────────────────
+     Tu web es estática y no puede enviar correo sola: necesita un servicio
+     que reciba la solicitud y te la reenvíe a tu buzón.
+
+     Con Web3Forms (gratis, sin registro):
+       1. Entra en web3forms.com, escribe tu correo y te mandan una clave.
+       2. Pega esa clave abajo en access_key. Ya está.
+     El endpoint ya viene puesto. Con Formspree u otro, cambia la URL y
+     borra el access_key.
+
+     Mientras access_key esté vacío, el botón abre el correo del visitante
+     y además le enseña su solicitud lista para copiar.
+     ─────────────────────────────────────────────────────────────────── */
+  formEndpoint: "https://api.web3forms.com/submit",
+  formExtra: {
+    access_key: "945ca6e0-6f5b-48b1-b29e-8e2187b33e59",
+    subject: "Nueva solicitud desde holdtix.com",
+    from_name: "Web HoldTix"
+  },
+
+  /* Dirección de respaldo, visible en la web. Con tu catch-all te llega
+     cualquier cosa @holdtix.com, así que puedes cambiarla a gusto. */
   emailContacto: "hola@holdtix.com"
 };
 
@@ -1471,44 +1504,81 @@ $$("#nav a").forEach(a => a.addEventListener("click", () => {
 }));
 
 /* --- Formulario --- */
+function textoSolicitud(datos){
+  const et = { evento:"Evento", ciudad:"Ciudad o recinto", fecha:"Fecha", unidades:"Entradas",
+               presupuesto:"Presupuesto máx.", nombre:"Nombre", contacto:"Email", notas:"Notas" };
+  return "Solicitud de entradas — holdtix.com\n\n" +
+    Object.entries(datos).filter(([,v]) => String(v).trim())
+      .map(([k,v]) => `${et[k] || k}: ${v}`).join("\n");
+}
+
+/* Último recurso: si no hay forma de enviar automáticamente, se le enseña
+   al visitante su propia solicitud con un botón de copiar y la dirección.
+   Así nunca se pierde un contacto por un botón que no hace nada. */
+function planB(texto){
+  const es = idioma === "es";
+  const caja = $("#formFallback");
+  caja.hidden = false;
+  caja.innerHTML = `
+    <p class="fb__t">${es ? "Copia esto y envíanoslo a " : "Copy this and send it to "}
+       <a href="mailto:${DATOS.emailContacto}">${DATOS.emailContacto}</a></p>
+    <textarea class="fb__box" readonly rows="7"></textarea>
+    <button type="button" class="btn btn--ghost fb__copy">${es ? "Copiar solicitud" : "Copy request"}</button>`;
+  caja.querySelector(".fb__box").value = texto;
+  caja.querySelector(".fb__copy").addEventListener("click", async ev => {
+    const ta = caja.querySelector(".fb__box");
+    try{ await navigator.clipboard.writeText(texto); }
+    catch{ ta.select(); document.execCommand("copy"); }
+    ev.target.textContent = es ? "✓ Copiado" : "✓ Copied";
+  });
+  caja.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block:"nearest" });
+}
+
 $("#reqForm").addEventListener("submit", async e => {
   e.preventDefault();
-  const f = e.target, msg = $("#formMsg");
+  const f = e.target, msg = $("#formMsg"), es = idioma === "es";
   if (!f.checkValidity()){ f.reportValidity(); return; }
   const datos = Object.fromEntries(new FormData(f).entries());
+  if (datos.empresa){ f.reset(); return; }           // señuelo: solo lo rellenan bots
+  delete datos.empresa;
+  const texto = textoSolicitud(datos);
+  msg.hidden = false; msg.style.color = "";
+  $("#formFallback").hidden = true;
 
-  if (DATOS.formEndpoint){
+  // 1) Servicio de formularios: el único que confirma el envío de verdad.
+  if (DATOS.formEndpoint && (!DATOS.formExtra || DATOS.formExtra.access_key !== "")){
+    msg.textContent = es ? "Enviando…" : "Sending…";
     try{
+      const cuerpo = new FormData(f);
+      cuerpo.delete("empresa");                       // el señuelo no se envía
+      Object.entries(DATOS.formExtra || {}).forEach(([k,v]) => cuerpo.append(k, v));
+      // Si el contacto es un email, así puedes responder directamente.
+      if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(datos.contacto || ""))
+        cuerpo.append("replyto", datos.contacto);
       const r = await fetch(DATOS.formEndpoint, {
-        method:"POST",
-        headers:{ "Accept":"application/json" },
-        body:new FormData(f)
+        method:"POST", headers:{ "Accept":"application/json" }, body:cuerpo
       });
-      if (!r.ok) throw new Error();
-      msg.hidden = false;
-      msg.textContent = idioma === "es"
-        ? "✓ Solicitud enviada. Te respondemos en menos de 2 h."
-        : "✓ Request sent. We'll reply within 2 hours.";
+      if (!r.ok) throw new Error(r.status);
+      msg.textContent = es ? "✓ Solicitud enviada. Te respondemos en menos de 2 h."
+                           : "✓ Request sent. We'll reply within 2 hours.";
       f.reset();
     }catch{
-      msg.hidden = false;
       msg.style.color = "var(--danger)";
-      msg.textContent = idioma === "es"
-        ? "No se pudo enviar. Escríbenos a " + DATOS.emailContacto
-        : "Couldn't send. Email us at " + DATOS.emailContacto;
+      msg.textContent = es ? "No se ha podido enviar automáticamente. Copia tu solicitud y mándanosla:"
+                           : "Couldn't send automatically. Copy your request and send it to us:";
+      planB(texto);
     }
     return;
   }
 
-  // Sin endpoint: abrimos el correo con la solicitud ya redactada
-  const cuerpo = Object.entries(datos).map(([k, v]) => `${k}: ${v}`).join("\n");
+  // 2) Correo. Puede no hacer nada si el visitante no tiene cliente configurado,
+  //    así que el plan B se muestra siempre a la vez.
   location.href = `mailto:${DATOS.emailContacto}`
     + `?subject=${encodeURIComponent("Solicitud de entradas — " + (datos.evento || ""))}`
-    + `&body=${encodeURIComponent(cuerpo)}`;
-  msg.hidden = false;
-  msg.textContent = idioma === "es"
-    ? "Abriendo tu cliente de correo…"
-    : "Opening your email client…";
+    + `&body=${encodeURIComponent(texto)}`;
+  msg.textContent = es ? "Si no se te ha abierto el correo, copia tu solicitud aquí abajo:"
+                       : "If your email app didn't open, copy your request below:";
+  planB(texto);
 });
 
 /* --- Arranque --- */
