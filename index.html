@@ -302,6 +302,53 @@ p{ margin:0; }
    EVENTOS
    ============================================================ */
 /* ============================================================
+   DISPONIBLE AHORA
+   ============================================================ */
+.avail{
+  display:grid; gap:12px;
+  grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+}
+.ev{
+  position:relative; display:flex; align-items:center; gap:14px;
+  background:var(--ink-2); border:1px solid var(--edge);
+  border-left:3px solid var(--foil-dim);
+  border-radius:var(--r-sm); padding:15px 17px;
+  transition:border-color .2s ease, transform .2s ease;
+}
+.ev:hover{ border-color:var(--edge); border-left-color:var(--foil); transform:translateY(-2px); }
+.ev__main{ min-width:0; flex:1; }
+.ev__n{
+  font-family:var(--f-display); font-stretch:114%; font-weight:800;
+  font-size:1.02rem; line-height:1.2; margin-bottom:3px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.ev__d{
+  font-family:var(--f-mono); font-size:.68rem; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--muted);
+}
+.ev__q{
+  flex:none; text-align:center; padding-left:13px;
+  border-left:1px dashed rgba(138,143,176,.28);
+}
+.ev__q b{
+  display:block; font-family:var(--f-mono); font-size:1.12rem;
+  font-weight:700; color:var(--foil); line-height:1;
+}
+.ev__q span{
+  display:block; font-family:var(--f-mono); font-size:.55rem;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-top:4px;
+}
+.avail__foot{
+  margin-top:20px; text-align:center;
+  font-family:var(--f-mono); font-size:.68rem; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--muted);
+}
+.avail__vacio{
+  border:1px dashed var(--edge); border-radius:var(--r-lg);
+  padding:30px; text-align:center; color:var(--muted); font-size:.95rem;
+}
+
+/* ============================================================
    TRAYECTORIA — cintas de artistas
    ============================================================ */
 .marquees{
@@ -451,6 +498,12 @@ textarea{ resize:vertical; min-height:96px; }
 .fb__t{ font-size:.86rem; color:var(--muted); margin-bottom:12px; }
 .fb__t a{ color:var(--foil); }
 .fb__box{ font-family:var(--f-mono); font-size:.8rem; margin-bottom:12px; }
+.debug-box{
+  margin-top:12px; padding:12px; border:1px solid var(--foil-dim);
+  border-radius:var(--r-sm); background:rgba(224,178,76,.06);
+  font-family:var(--f-mono); font-size:.75rem; color:var(--foil);
+  white-space:pre-wrap; word-break:break-word; overflow-x:auto;
+}
 
 /* ============================================================
    FAQ
@@ -548,6 +601,7 @@ details p{ color:var(--muted); font-size:.94rem; padding-bottom:22px; max-width:
 
     <nav class="nav" id="nav">
       <a href="#como" data-es="Cómo funciona" data-en="How it works">Cómo funciona</a>
+      <a href="#disponible" data-es="Disponible" data-en="Available">Disponible</a>
       <a href="#trayectoria" data-es="Trayectoria" data-en="Track record">Trayectoria</a>
       <a href="#garantia" data-es="Garantía" data-en="Guarantee">Garantía</a>
       <a href="#faq" data-es="Preguntas" data-en="FAQ">Preguntas</a>
@@ -660,6 +714,27 @@ details p{ color:var(--muted); font-size:.94rem; padding-bottom:22px; max-width:
         <div class="perf step__perf"></div>
       </article>
     </div>
+  </div>
+</section>
+
+<!-- ══════════════ DISPONIBLE AHORA ══════════════ -->
+<section class="section section--tight" id="disponible" hidden>
+  <div class="shell">
+    <div class="sec-head rv">
+      <p class="eyebrow" data-es="Cartera abierta" data-en="Open inventory">Cartera abierta</p>
+      <h2 data-es="Lo que tenemos ahora mismo" data-en="What we have right now">Lo que tenemos ahora mismo</h2>
+      <p class="lede"
+         data-es="Entradas ya aseguradas y sin asignar. Esta lista sale directamente de nuestro inventario, así que lo que ves aquí existe hoy."
+         data-en="Tickets already secured and unassigned. This list comes straight from our inventory, so what you see here exists today.">
+        Entradas ya aseguradas y sin asignar. Esta lista sale directamente de nuestro inventario, así que lo que ves aquí existe hoy.
+      </p>
+    </div>
+
+    <div class="avail rv" id="avail"></div>
+
+    <p class="avail__foot rv" id="availFoot"></p>
+    <a class="lineup__cta rv" href="#solicitar"
+       data-es="¿Buscas otro evento? Te lo conseguimos" data-en="Looking for another event? We'll get it">¿Buscas otro evento? Te lo conseguimos</a>
   </div>
 </section>
 
@@ -936,6 +1011,11 @@ const IDIOMA_INICIAL = "es"; // "es" o "en"
    Ponlo en true si prefieres que se desplace siempre, pase lo que pase. */
 const MOVIMIENTO_SIEMPRE = true;
 
+/* Añade ?debug=1 a la URL y el formulario enseña en pantalla la respuesta
+   exacta del servicio de correo. Sirve para diagnosticar desde el móvil,
+   donde no hay consola. Los visitantes normales no ven nada de esto. */
+const DEBUG = new URLSearchParams(location.search).has("debug");
+
 const DATOS = {
 
   /* ─── ACTUALIZACIÓN AUTOMÁTICA (desactivada) ─────────────────────────
@@ -952,7 +1032,13 @@ const DATOS = {
   /* Columnas de la pestaña "Web" (0 = A, 1 = B, 2 = C, 3 = D):
         A Evento · B Localidad ("Numerada"/"General") · C Uds · D Vendida (1/0)
      Si algún día lees las pestañas originales en crudo, cambia venta a 4. */
-  col: { evento:0, asiento:1, uds:2, venta:3 },
+  col: { evento:0, asiento:1, uds:2, venta:3, hoja:4 },
+
+  /* Qué pestañas cuentan como inventario disponible. Solo lo que venga
+     de aquí y siga sin vender se publica en "Lo que tenemos ahora mismo".
+     Si la columna "Hoja" no existe en tu pestaña Web, la sección no se
+     muestra: es preferible no enseñar nada a enseñar eventos ya pasados. */
+  hojasConStock: ["Actual"],
 
   /* Normalización de nombres. Tu hoja mezcla artista, ciudad y fecha
      en la misma casilla, y el mismo artista aparece escrito de varias
@@ -1128,17 +1214,14 @@ const DATOS = {
   // Crea un formulario gratis en formspree.io y pega aquí tu endpoint.
   // Si lo dejas vacío, el botón abre el correo del usuario con todo relleno.
   /* ─── A DÓNDE VA EL FORMULARIO ────────────────────────────────────────
-     Tu web es estática y no puede enviar correo sola: necesita un servicio
-     que reciba la solicitud y te la reenvíe a tu buzón.
+     Las solicitudes se envían a Web3Forms, que te las reenvía por correo.
+     La clave de acceso no es secreta: va en el HTML a propósito.
 
-     Con Web3Forms (gratis, sin registro):
-       1. Entra en web3forms.com, escribe tu correo y te mandan una clave.
-       2. Pega esa clave abajo en access_key. Ya está.
-     El endpoint ya viene puesto. Con Formspree u otro, cambia la URL y
-     borra el access_key.
+     Si algún día quieres desactivarlo y volver a que se abra el correo del
+     visitante, deja access_key vacío. El resto del código ya lo contempla.
 
-     Mientras access_key esté vacío, el botón abre el correo del visitante
-     y además le enseña su solicitud lista para copiar.
+     Para diagnosticar un fallo: entra en holdtix.com/?debug=1 y envía el
+     formulario. Verás en pantalla la respuesta literal del servicio.
      ─────────────────────────────────────────────────────────────────── */
   formEndpoint: "https://api.web3forms.com/submit",
   formExtra: {
@@ -1220,6 +1303,16 @@ function limpiaNombre(s){
 
 /* Localidad numerada = la casilla menciona fila/asiento, o viene en
    formato SECCIÓN|FILA|ASIENTO. "Pista", "Floor" o "GA" no lo son.  */
+/* Saca el trozo de fecha del nombre: "Olivia Rodrigo 09/04" -> "09/04".
+   La hoja no guarda el año, así que se muestra tal cual viene. */
+function fechaDe(s){
+  const t = String(s||"");
+  let m = t.match(/(\d{1,2}\/\d{1,2}(?:\/\d{2,4})?)/);
+  if (m) return m[1];
+  m = t.match(new RegExp("(\\d{1,2}\\s+(?:" + MESES_RX + "))","i"));
+  return m ? m[1] : "";
+}
+
 const RX_NUM = /\bfila\b|\brow\b|\basiento|\bseat|\|/i;   // misma regla que la fórmula del Sheet
 function esNumerada(z){
   const t = String(z||"").trim();
@@ -1234,8 +1327,9 @@ function esNumerada(z){
 /* --- Recalcula todo a partir de las filas de TODAS las hojas --- */
 function calcular(filas){
   const C = DATOS.col;
-  const art = new Map(), eventos = new Set();
+  const art = new Map(), eventos = new Set(), libres = new Map();
   let entradas=0, vendidas=0, numeradas=0, ga=0, lotes=0, lotesDe2=0, maxPedido=0;
+  let hayColumnaHoja = false;
 
   filas.forEach(f => {
     const nombre = limpiaNombre(f[C.evento]);
@@ -1250,7 +1344,19 @@ function calcular(filas){
     if (uds > maxPedido) maxPedido = uds;
     if (esNumerada(f[C.asiento])) numeradas += uds; else ga += uds;
     // "colocada" = tiene precio de venta apuntado. El importe no se guarda.
-    if (numero(f[C.venta]) > 0) vendidas += uds;
+    const colocada = numero(f[C.venta]) > 0;
+    if (colocada) vendidas += uds;
+
+    // Inventario disponible: sin vender y de una pestaña con stock.
+    const hoja = String(f[C.hoja]||"").trim();
+    if (hoja) hayColumnaHoja = true;
+    if (!colocada && hoja && DATOS.hojasConStock.includes(hoja)){
+      const crudoEv = String(f[C.evento]||"").trim();
+      const clave = nombre + "|" + fechaDe(crudoEv);
+      const g = libres.get(clave) || { nombre, fecha: fechaDe(crudoEv), uds: 0 };
+      g.uds += uds;
+      libres.set(clave, g);
+    }
     eventos.add(String(f[C.evento]||"").trim().toLowerCase());
     art.set(nombre, (art.get(nombre)||0) + uds);
   });
@@ -1260,6 +1366,7 @@ function calcular(filas){
   return {
     entradas, vendidas, numeradas, ga, lotes, lotesDe2, maxPedido,
     artistas: art.size, eventos: eventos.size,
+    libres: hayColumnaHoja ? [...libres.values()].sort((a,b) => b.uds - a.uds) : null,
     lineup: [...art.entries()].sort((a,b) => b[1]-a[1]),
     fuente: "hoja"
   };
@@ -1341,6 +1448,38 @@ function ajustaVelocidad(pistas){
   });
 }
 
+/* --- Lo que tenemos ahora mismo --- */
+function pintarDisponible(){
+  const sec = $("#disponible"), cont = $("#avail"), es = idioma === "es";
+
+  // Sin columna "Hoja" no se puede distinguir inventario de eventos pasados.
+  if (!S.libres){ sec.hidden = true; return; }
+  sec.hidden = false;
+
+  if (!S.libres.length){
+    cont.innerHTML = `<p class="avail__vacio">` + (es
+      ? "Ahora mismo no tenemos entradas sin asignar. Dinos qué evento buscas y salimos a por él."
+      : "Right now we have no unassigned tickets. Tell us which event you need and we'll go get it.") + `</p>`;
+    $("#availFoot").textContent = "";
+    return;
+  }
+
+  cont.innerHTML = S.libres.map(e => `
+    <article class="ev">
+      <div class="ev__main">
+        <p class="ev__n" title="${e.nombre}">${e.nombre}</p>
+        <p class="ev__d">${e.fecha || (es ? "Fecha por confirmar" : "Date TBC")}</p>
+      </div>
+      <div class="ev__q"><b>${e.uds}</b><span>${es ? "uds" : "qty"}</span></div>
+    </article>`).join("");
+
+  const tot = S.libres.reduce((a,b) => a + b.uds, 0);
+  $("#availFoot").textContent = es
+    ? `${tot} entradas libres en ${S.libres.length} eventos · se actualiza solo`
+    : `${tot} tickets free across ${S.libres.length} events · updates itself`;
+  observarRevelado();
+}
+
 /* --- Barras de reparto por categoría --- */
 function pintarBarras(){
   const otros = idioma === "es" ? "Otros conciertos" : "Other concerts";
@@ -1382,7 +1521,7 @@ function pintarPerfil(){
 }
 
 function pintarTodo(){
-  pintarMetricas(); pintarLineup(); pintarBarras(); pintarPerfil(); pintarTicket();
+  pintarMetricas(); pintarDisponible(); pintarLineup(); pintarBarras(); pintarPerfil(); pintarTicket();
 }
 
 /* --- Carga de las hojas en vivo --- */
@@ -1558,14 +1697,24 @@ $("#reqForm").addEventListener("submit", async e => {
       const r = await fetch(DATOS.formEndpoint, {
         method:"POST", headers:{ "Accept":"application/json" }, body:cuerpo
       });
-      if (!r.ok) throw new Error(r.status);
+      // Ojo: el servicio puede responder 200 y aun así haber fallado.
+      // Hay que mirar el cuerpo, no solo el código HTTP.
+      let json = null;
+      try{ json = await r.clone().json(); }catch{}
+      console.info("HoldTix: respuesta del formulario", r.status, json);
+      if (DEBUG) msg.insertAdjacentHTML("afterend",
+        '<pre class="debug-box">HTTP ' + r.status + "\n"
+        + JSON.stringify(json, null, 2).replace(/</g,"&lt;") + "</pre>");
+      if (!r.ok || (json && json.success === false))
+        throw new Error((json && json.message) || ("HTTP " + r.status));
       msg.textContent = es ? "✓ Solicitud enviada. Te respondemos en menos de 2 h."
                            : "✓ Request sent. We'll reply within 2 hours.";
       f.reset();
-    }catch{
+    }catch(err){
+      console.warn("HoldTix: el envío ha fallado →", err.message);
       msg.style.color = "var(--danger)";
-      msg.textContent = es ? "No se ha podido enviar automáticamente. Copia tu solicitud y mándanosla:"
-                           : "Couldn't send automatically. Copy your request and send it to us:";
+      msg.textContent = (es ? "No se ha podido enviar automáticamente. Copia tu solicitud y mándanosla:"
+                            : "Couldn't send automatically. Copy your request and send it to us:");
       planB(texto);
     }
     return;
