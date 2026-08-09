@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HoldTix — Entradas para eventos agotados</title>
-<meta name="description" content="HoldTix Operations LLC consigue entradas para eventos agotados. Reventa verificada y encargos a medida, con entrega garantizada antes de la apertura de puertas.">
-<meta property="og:title" content="HoldTix — Entradas para eventos agotados">
-<meta property="og:description" content="Reventa verificada y encargos a medida. Entrega garantizada antes de la apertura de puertas.">
+<title>HoldTix — Tickets for sold-out events</title>
+<meta name="description" content="HoldTix Operations LLC sources tickets for sold-out events. Verified resale and made-to-order requests, delivered before doors open.">
+<meta property="og:title" content="HoldTix — Tickets for sold-out events">
+<meta property="og:description" content="Verified resale and made-to-order requests. Delivered before doors open.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://holdtix.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,7 +44,7 @@
    BASE
    ============================================================ */
 *,*::before,*::after{ box-sizing:border-box; }
-html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; overflow-x:clip; }
 body{
   margin:0;
   background:var(--ink);
@@ -177,7 +177,8 @@ p{ margin:0; }
 }
 .nav a:hover{ color:var(--paper); }
 
-.hdr__end{ display:flex; align-items:center; gap:14px; }
+.hdr__end{ display:flex; align-items:center; gap:14px; min-width:0; }
+.nav__cta{ display:none; }
 
 .lang{ display:flex; border:1px solid var(--edge); border-radius:6px; overflow:hidden; }
 .lang button{
@@ -197,6 +198,7 @@ p{ margin:0; }
 .hero__grid{
   display:grid; grid-template-columns:1fr .84fr; gap:clamp(36px,5vw,68px); align-items:center;
 }
+.hero__grid > *{ min-width:0; }
 .hero h1 em{
   font-style:normal;
   background:linear-gradient(96deg,var(--foil) 20%,var(--holo) 92%);
@@ -237,8 +239,9 @@ p{ margin:0; }
 }
 .ticket__venue{ color:var(--muted); font-size:.88rem; }
 .ticket__fields{
-  display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:22px;
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:22px;
 }
+.ticket__fields > div{ min-width:0; }
 .field__k{
   font-family:var(--f-mono); font-size:.6rem; letter-spacing:.2em;
   text-transform:uppercase; color:var(--muted); display:block; margin-bottom:4px;
@@ -248,12 +251,14 @@ p{ margin:0; }
 .ticket__bottom{
   padding:20px 24px 22px; display:flex; align-items:center; justify-content:space-between; gap:14px;
 }
+.ticket__bottom > *{ min-width:0; }
+.ticket__status{ flex:none; }
 .ticket__status{
   display:flex; align-items:center; gap:8px;
   font-family:var(--f-mono); font-size:.7rem; letter-spacing:.12em;
   text-transform:uppercase; color:var(--holo);
 }
-.barcode{ display:flex; gap:2px; align-items:flex-end; height:34px; }
+.barcode{ display:flex; gap:2px; align-items:flex-end; height:34px; overflow:hidden; min-width:0; }
 .barcode i{ display:block; width:2px; background:var(--paper); opacity:.82; }
 
 /* ============================================================
@@ -322,6 +327,14 @@ p{ margin:0; }
   font-size:1.02rem; line-height:1.2; margin-bottom:3px;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
+.ev__mult{
+  display:inline-block; margin-left:8px; padding:2px 7px; border-radius:99px;
+  background:rgba(224,178,76,.14); border:1px solid rgba(224,178,76,.3);
+  font-family:var(--f-mono); font-size:.56rem; font-weight:700;
+  letter-spacing:.08em; text-transform:uppercase; color:var(--foil);
+  vertical-align:middle;
+}
+.ev__n{ white-space:normal !important; }
 .ev__d{
   font-family:var(--f-mono); font-size:.68rem; letter-spacing:.13em;
   text-transform:uppercase; color:var(--muted);
@@ -491,6 +504,10 @@ input:focus,select:focus,textarea:focus{ border-color:var(--foil); outline:none;
 textarea{ resize:vertical; min-height:96px; }
 .form-note{ font-size:.78rem; color:var(--muted); margin-top:14px; }
 .form-msg{ margin-top:14px; font-family:var(--f-mono); font-size:.78rem; color:var(--holo); }
+.trampa{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0;
+}
 .form-fallback{
   margin-top:16px; padding:18px; border:1px dashed var(--edge);
   border-radius:var(--r-sm); background:rgba(255,255,255,.02);
@@ -571,19 +588,36 @@ details p{ color:var(--muted); font-size:.94rem; padding-bottom:22px; max-width:
   .ftr__top{ grid-template-columns:1fr 1fr; }
 }
 @media (max-width:720px){
+  .steps{ grid-template-columns:1fr; }
+  .form-grid{ grid-template-columns:1fr; }
+  .ftr__top{ grid-template-columns:1fr; }
+}
+/* La cabecera se pliega antes que el resto: con el logo, los 5 enlaces,
+   el selector de idioma y el botón dorado, por debajo de 900px no cabe. */
+@media (max-width:900px){
   .nav{
     position:absolute; top:70px; left:0; right:0; flex-direction:column; gap:0;
     background:var(--ink-2); border-bottom:1px solid var(--edge);
     max-height:0; overflow:hidden; transition:max-height .3s ease;
   }
-  .nav.open{ max-height:300px; }
+  .nav.open{ max-height:480px; }
   .nav a{ padding:15px var(--gut); border-top:1px solid var(--edge); }
   .burger{ display:block; }
-  .hdr__in{ position:relative; }
-  .steps{ grid-template-columns:1fr; }
-  .form-grid{ grid-template-columns:1fr; }
-  .ftr__top{ grid-template-columns:1fr; }
+  .hdr__in{ position:relative; gap:12px; }
+  /* El botón dorado no cabe junto al logo, el idioma y la hamburguesa:
+     se esconde y aparece dentro del menú desplegable. */
+  .hdr__end > .btn--gold{ display:none; }
+  .nav__cta{ display:block; color:var(--foil) !important; font-weight:600; }
 }
+
+@media (max-width:400px){
+  :root{ --gut:16px; }
+  .ticket__fields{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+  .ticket__fields > div:last-child{ grid-column:1 / -1; }
+  .ticket__event{ font-size:1.5rem; }
+  .stat{ padding:26px 12px; }
+}
+
 @media (prefers-reduced-motion:reduce){
   *:not(.mq__track),*::before,*::after{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
   html{ scroll-behavior:auto; }
@@ -605,6 +639,7 @@ details p{ color:var(--muted); font-size:.94rem; padding-bottom:22px; max-width:
       <a href="#trayectoria" data-es="Trayectoria" data-en="Track record">Trayectoria</a>
       <a href="#garantia" data-es="Garantía" data-en="Guarantee">Garantía</a>
       <a href="#faq" data-es="Preguntas" data-en="FAQ">Preguntas</a>
+      <a class="nav__cta" href="#solicitar" data-es="Pedir entradas" data-en="Request tickets">Pedir entradas</a>
     </nav>
 
     <div class="hdr__end">
@@ -881,7 +916,7 @@ details p{ color:var(--muted); font-size:.94rem; padding-bottom:22px; max-width:
             <label for="notas" data-es="Detalles (zona preferida, flexibilidad de fecha…)" data-en="Details (preferred section, date flexibility…)">Detalles (zona preferida, flexibilidad de fecha…)</label>
             <textarea id="notas" name="notas"></textarea>
           </div>
-          <div class="f-full" aria-hidden="true" style="position:absolute;left:-9999px">
+          <div class="f-full trampa" aria-hidden="true">
             <label for="empresa">Empresa</label>
             <input id="empresa" name="empresa" tabindex="-1" autocomplete="off">
           </div>
@@ -1004,7 +1039,7 @@ details p{ color:var(--muted); font-size:.94rem; padding-bottom:22px; max-width:
    Si rellenas csvUrl, la web recalcula sola y no tocas nada más.
    ══════════════════════════════════════════════════════════════ */
 
-const IDIOMA_INICIAL = "es"; // "es" o "en"
+const IDIOMA_INICIAL = "en"; // "es" o "en"
 
 /* Si el visitante tiene activado "reducir movimiento" en su sistema, la
    cinta se queda quieta (es lo correcto y lo que esperan esos usuarios).
@@ -1159,17 +1194,24 @@ const DATOS = {
      datos se ignora sin romper nada. Cuantos menos haya, más a menudo
      vuelve a pasar cada uno.
      ─────────────────────────────────────────────────────────────────── */
+  /* Cómo se ordena la cinta:
+       "manual"  → en el orden escrito abajo. Tú decides quién va primero.
+       "volumen" → los de más entradas primero, recalculado desde tu hoja.
+     En ambos casos solo salen nombres de esta lista: es tu filtro de
+     calidad. Un artista nuevo no aparece hasta que lo añadas aquí. */
+  cartelOrden: "manual",
+
   cartel: [
     "Coldplay", "Imagine Dragons", "Rosalía",
     "Taylor Swift", "Bad Bunny", "Bruno Mars",
-    "Lady Gaga", "Adele", "Olivia Rodrigo",
+    "Lady Gaga", "Lorde", "Olivia Rodrigo",
     "Dua Lipa", "Kendrick Lamar", "Fútbol de selecciones",
     "The Weeknd", "Shakira", "Ed Sheeran",
     "Billie Eilish", "Oasis", "AC/DC",
     "Elton John", "BTS", "Bon Jovi",
     "Rauw Alejandro", "Sabrina Carpenter", "Karol G",
     "Fórmula 1", "Radiohead", "Linkin Park",
-    "Foo Fighters", "Lana del Rey", "Eurovision",
+    "Foo Fighters", "Lana del Rey", "Lewis Capaldi", "Chris Brown", "Eurovision",
   ],
 
   /* ─── CIFRAS ──────────────────────────────────────────────────────
@@ -1246,9 +1288,19 @@ const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let idioma = IDIOMA_INICIAL;
 
 /* --- Idioma --- */
+const TITULOS = {
+  es: ["HoldTix — Entradas para eventos agotados",
+       "HoldTix Operations LLC consigue entradas para eventos agotados. Reventa verificada y encargos a medida, con entrega garantizada antes de la apertura de puertas."],
+  en: ["HoldTix — Tickets for sold-out events",
+       "HoldTix Operations LLC sources tickets for sold-out events. Verified resale and made-to-order requests, delivered before doors open."]
+};
+
 function aplicarIdioma(l){
   idioma = l;
   document.documentElement.lang = l;
+  document.title = TITULOS[l][0];
+  const md = document.querySelector('meta[name="description"]');
+  if (md) md.setAttribute("content", TITULOS[l][1]);
   $$("[data-es]").forEach(el => {
     const txt = el.dataset[l];
     if (txt === undefined) return;
@@ -1351,11 +1403,11 @@ function calcular(filas){
     const hoja = String(f[C.hoja]||"").trim();
     if (hoja) hayColumnaHoja = true;
     if (!colocada && hoja && DATOS.hojasConStock.includes(hoja)){
-      const crudoEv = String(f[C.evento]||"").trim();
-      const clave = nombre + "|" + fechaDe(crudoEv);
-      const g = libres.get(clave) || { nombre, fecha: fechaDe(crudoEv), uds: 0 };
+      const fecha = fechaDe(String(f[C.evento]||"").trim());
+      const g = libres.get(nombre) || { nombre, fechas: new Set(), uds: 0 };
       g.uds += uds;
-      libres.set(clave, g);
+      if (fecha) g.fechas.add(fecha);
+      libres.set(nombre, g);
     }
     eventos.add(String(f[C.evento]||"").trim().toLowerCase());
     art.set(nombre, (art.get(nombre)||0) + uds);
@@ -1363,10 +1415,39 @@ function calcular(filas){
 
   if (!lotes) throw new Error("Sin filas válidas");
 
+  /* Tu hoja a veces antepone la ciudad al artista ("Zúrich Taylor Swift",
+     "Roma Coldplay"). Si un nombre termina exactamente en otro nombre que
+     ya existe por su cuenta, se fusionan. Así no hace falta un alias nuevo
+     cada vez que escribas una ciudad delante. */
+  [...art.keys()].forEach(largo => {
+    const trozos = largo.split(" ");
+    for (let i = 1; i < trozos.length; i++){
+      const cola = trozos.slice(i).join(" ");
+      if (cola.length >= 4 && cola !== largo && art.has(cola)){
+        art.set(cola, art.get(cola) + art.get(largo));
+        art.delete(largo);
+        const a = libres.get(largo);
+        if (a){
+          const bq = libres.get(cola) || { nombre: cola, fechas: new Set(), uds: 0 };
+          bq.uds += a.uds; a.fechas.forEach(x => bq.fechas.add(x));
+          libres.set(cola, bq); libres.delete(largo);
+        }
+        console.info("HoldTix: fusionado \"" + largo + "\" con \"" + cola + "\"");
+        break;
+      }
+    }
+  });
+
   return {
     entradas, vendidas, numeradas, ga, lotes, lotesDe2, maxPedido,
     artistas: art.size, eventos: eventos.size,
-    libres: hayColumnaHoja ? [...libres.values()].sort((a,b) => b.uds - a.uds) : null,
+    libres: hayColumnaHoja ? [...libres.values()].map(g => ({
+        nombre: g.nombre, uds: g.uds,
+        fechas: [...g.fechas].sort((x,y) => {
+          const p = s => { const m = s.match(/(\d{1,2})\/(\d{1,2})/); return m ? +m[2]*100 + +m[1] : 9999; };
+          return p(x) - p(y);
+        })
+      })).sort((a,b) => b.uds - a.uds) : null,
     lineup: [...art.entries()].sort((a,b) => b[1]-a[1]),
     fuente: "hoja"
   };
@@ -1398,9 +1479,14 @@ function pintarLineup(){
   const vol = new Map(S.lineup);
 
   // Si hay selección curada se usa esa; si no, los nombres por volumen.
-  const L = (DATOS.cartel && DATOS.cartel.length)
-    ? DATOS.cartel.filter(n => vol.has(n)).map(n => [n, vol.get(n)])
-    : S.lineup;
+  let L;
+  if (DATOS.cartel && DATOS.cartel.length){
+    L = DATOS.cartel.filter(n => vol.has(n)).map(n => [n, vol.get(n)]);
+    if (DATOS.cartelOrden === "volumen") L.sort((a,b) => b[1] - a[1]);
+    avisaCandidatos(vol);
+  } else {
+    L = S.lineup;
+  }
 
   cont.innerHTML = "";
   const mq = document.createElement("div");
@@ -1437,6 +1523,17 @@ function pintarLineup(){
     : `A selection from ${S.artistas} artists and events covered · ${S.entradas} tickets handled`;
 }
 
+/* Aviso en consola: artistas con volumen alto que no están en el cartel.
+   Sirve para detectar cuándo merece la pena añadir a alguien nuevo. */
+function avisaCandidatos(vol){
+  const dentro = new Set(DATOS.cartel);
+  const fuera = [...vol.entries()]
+    .filter(([n,c]) => !dentro.has(n) && c >= 8)
+    .sort((a,b) => b[1]-a[1]);
+  if (fuera.length) console.info("HoldTix: con volumen alto y fuera del cartel →",
+    fuera.map(([n,c]) => `${n} (${c})`).join(", "));
+}
+
 /* Velocidad constante sea cual sea el largo de la lista.
    Sube el número para que vaya más rápido. */
 function ajustaVelocidad(pistas){
@@ -1464,19 +1561,28 @@ function pintarDisponible(){
     return;
   }
 
-  cont.innerHTML = S.libres.map(e => `
+  cont.innerHTML = S.libres.map(e => {
+    let f;
+    if (!e.fechas.length)      f = es ? "Fecha por confirmar" : "Date TBC";
+    else if (e.fechas.length <= 3) f = e.fechas.join(" · ");
+    else f = e.fechas.slice(0,2).join(" · ") + " +" + (e.fechas.length - 2);
+    const etiq = e.fechas.length > 1
+      ? `<span class="ev__mult">${e.fechas.length} ${es ? "fechas" : "dates"}</span>` : "";
+    return `
     <article class="ev">
       <div class="ev__main">
-        <p class="ev__n" title="${e.nombre}">${e.nombre}</p>
-        <p class="ev__d">${e.fecha || (es ? "Fecha por confirmar" : "Date TBC")}</p>
+        <p class="ev__n" title="${e.nombre}">${e.nombre}${etiq}</p>
+        <p class="ev__d" title="${e.fechas.join(" · ")}">${f}</p>
       </div>
       <div class="ev__q"><b>${e.uds}</b><span>${es ? "uds" : "qty"}</span></div>
-    </article>`).join("");
+    </article>`;
+  }).join("");
 
   const tot = S.libres.reduce((a,b) => a + b.uds, 0);
+  const nf  = S.libres.reduce((a,b) => a + Math.max(1, b.fechas.length), 0);
   $("#availFoot").textContent = es
-    ? `${tot} entradas libres en ${S.libres.length} eventos · se actualiza solo`
-    : `${tot} tickets free across ${S.libres.length} events · updates itself`;
+    ? `${tot} entradas libres · ${S.libres.length} artistas · ${nf} fechas · se actualiza solo`
+    : `${tot} tickets free · ${S.libres.length} artists · ${nf} dates · updates itself`;
   observarRevelado();
 }
 
