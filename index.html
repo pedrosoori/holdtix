@@ -972,7 +972,7 @@ details p{ color:var(--muted); font-size:.94rem; padding-bottom:22px; max-width:
       <details>
         <summary data-es="¿Por qué no publicáis las entradas que tenéis?" data-en="Why don't you list the tickets you have?">¿Por qué no publicáis las entradas que tenéis?</summary>
         <p data-es="Porque la cartera cambia cada día: lo que hoy está libre mañana está vendido, y una lista desactualizada solo genera falsas expectativas. Preferimos enseñarte el histórico completo y responderte con disponibilidad real en el momento en que preguntas."
-           data-en="Because inventory changes daily: what's free today is sold tomorrow, and a stale list only creates false expectations. We'd rather show you the full record and answer with real availability the moment you ask.">
+           data-en="Because inventory changes daily: what's available today is sold tomorrow, and a stale list only creates false expectations. We'd rather show you the full record and answer with real availability the moment you ask.">
           Porque la cartera cambia cada día: lo que hoy está libre mañana está vendido, y una lista desactualizada solo genera falsas expectativas. Preferimos enseñarte el histórico completo y responderte con disponibilidad real en el momento en que preguntas.</p>
       </details>
       <details>
@@ -1582,7 +1582,7 @@ function pintarDisponible(){
   const nf  = S.libres.reduce((a,b) => a + Math.max(1, b.fechas.length), 0);
   $("#availFoot").textContent = es
     ? `${tot} entradas libres · ${S.libres.length} artistas · ${nf} fechas · se actualiza solo`
-    : `${tot} tickets free · ${S.libres.length} artists · ${nf} dates · updates itself`;
+    : `${tot} tickets available · ${S.libres.length} artists · ${nf} dates · updates itself`;
   observarRevelado();
 }
 
