@@ -623,6 +623,80 @@ details p{ color:var(--muted); font-size:.94rem; padding-bottom:22px; max-width:
   html{ scroll-behavior:auto; }
   .rv{ opacity:1; transform:none; }
 }
+
+/* ============================================================
+   MODALES LEGALES
+   ============================================================ */
+.modal-overlay{
+  position:fixed; inset:0; z-index:100;
+  background:rgba(5, 7, 15, 0.82);
+  backdrop-filter:blur(8px);
+  display:flex; align-items:center; justify-content:center;
+  padding:20px;
+  opacity:0; visibility:hidden;
+  transition:opacity .25s ease, visibility .25s ease;
+}
+.modal-overlay.open{
+  opacity:1; visibility:visible;
+}
+.modal-card{
+  background:var(--ink-2);
+  border:1px solid var(--edge);
+  border-radius:var(--r-lg);
+  width:100%; max-width:680px; max-height:85vh;
+  display:flex; flex-direction:column;
+  box-shadow:0 30px 80px rgba(0,0,0,.8);
+  transform:translateY(18px) scale(.98);
+  transition:transform .25s cubic-bezier(.2,.8,.3,1);
+  overflow:hidden;
+}
+.modal-overlay.open .modal-card{
+  transform:translateY(0) scale(1);
+}
+.modal-header{
+  padding:22px 26px 18px;
+  border-bottom:1px solid var(--edge);
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+}
+.modal-header h3{
+  font-size:1.3rem; margin:0;
+}
+.modal-close{
+  background:none; border:1px solid var(--edge); border-radius:6px;
+  color:var(--muted); font-size:1.1rem; line-height:1;
+  width:32px; height:32px; display:grid; place-items:center;
+  cursor:pointer; transition:border-color .18s, color .18s, background .18s;
+}
+.modal-close:hover{
+  border-color:var(--foil); color:var(--paper); background:rgba(255,255,255,.04);
+}
+.modal-body{
+  padding:24px 26px;
+  overflow-y:auto;
+  font-size:.92rem;
+  color:var(--paper);
+  line-height:1.65;
+}
+.modal-body h4{
+  font-family:var(--f-mono);
+  font-size:.78rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--foil);
+  margin:20px 0 8px;
+}
+.modal-body h4:first-child{ margin-top:0; }
+.modal-body p{
+  color:var(--muted);
+  margin-bottom:12px;
+}
+.modal-body ul{
+  margin:0 0 14px 20px;
+  padding:0;
+  color:var(--muted);
+}
+.modal-body li{ margin-bottom:6px; }
+
 </style>
 </head>
 
@@ -999,10 +1073,10 @@ details p{ color:var(--muted); font-size:.94rem; padding-bottom:22px; max-width:
       <div>
         <h4 data-es="Contacto" data-en="Contact">Contacto</h4>
         <ul>
-          <li><a href="mailto:hola@holdtix.com">hola@holdtix.com</a></li>
-          <li><a href="#" data-es="Aviso legal" data-en="Legal notice">Aviso legal</a></li>
-          <li><a href="#" data-es="Privacidad" data-en="Privacy">Privacidad</a></li>
-          <li><a href="#" data-es="Términos" data-en="Terms">Términos</a></li>
+          <li><a href="mailto:contact@holdtix.com">contact@holdtix.com</a></li>
+          <li><a href="#modal-legal" class="legal-link" data-modal="legal" data-es="Aviso legal" data-en="Legal notice">Aviso legal</a></li>
+          <li><a href="#modal-privacidad" class="legal-link" data-modal="privacidad" data-es="Privacidad" data-en="Privacy">Privacidad</a></li>
+          <li><a href="#modal-terminos" class="legal-link" data-modal="terminos" data-es="Términos" data-en="Terms">Términos</a></li>
         </ul>
       </div>
     </div>
@@ -1019,6 +1093,18 @@ details p{ color:var(--muted); font-size:.94rem; padding-bottom:22px; max-width:
     </div>
   </div>
 </footer>
+
+
+<!-- ══════════════ MODALES LEGALES ══════════════ -->
+<div class="modal-overlay" id="modalOverlay" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 id="modalTitle"></h3>
+      <button type="button" class="modal-close" id="modalClose" aria-label="Cerrar / Close">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
 
 <script>
 /* ══════════════════════════════════════════════════════════════
@@ -1263,7 +1349,7 @@ const DATOS = {
 
   /* Dirección de respaldo, visible en la web. Con tu catch-all te llega
      cualquier cosa @holdtix.com, así que puedes cambiarla a gusto. */
-  emailContacto: "hola@holdtix.com"
+  emailContacto: "contact@holdtix.com"
 };
 
 /* ══════════════════════════════════════════════════════════════
@@ -1823,6 +1909,136 @@ $("#reqForm").addEventListener("submit", async e => {
   msg.textContent = es ? "Si no se te ha abierto el correo, copia tu solicitud aquí abajo:"
                        : "If your email app didn't open, copy your request below:";
   planB(texto);
+});
+
+
+/* --- Gestión de Modales Legales --- */
+const legalContent = {
+  legal: {
+    title: { es: "Aviso Legal", en: "Legal Notice" },
+    body: {
+      es: `
+        <h4>1. Identificación y Titularidad</h4>
+        <p>En cumplimiento de las buenas prácticas comerciales y la normativa aplicable, se informa que este sitio web (<strong>holdtix.com</strong>) es operado por <strong>HoldTix Operations LLC</strong>, entidad mercantil registrada en los Estados Unidos. Para cualquier consulta, notificación o comunicación formal, puede contactarnos a través de <a href="mailto:contact@holdtix.com" style="color:var(--foil)">contact@holdtix.com</a>.</p>
+        
+        <h4>2. Actividad de la Empresa</h4>
+        <p>HoldTix Operations LLC se dedica a la intermediación, búsqueda personalizada y reventa de entradas para eventos deportivos, musicales y de entretenimiento en el mercado secundario. Proporcionamos un servicio especializado de localización y garantía de entradas cuando los canales oficiales de venta primaria están agotados o no disponen de localidades óptimas.</p>
+        
+        <h4>3. Cláusula de Independencia y Exención de Responsabilidad</h4>
+        <p>HoldTix Operations LLC es una entidad y vendedora independiente. No mantenemos ninguna relación de agencia, afiliación comercial, patrocinio ni vinculación corporativa directa con los promotores de eventos, artistas, recintos, equipos deportivos ni con los puntos de venta primarios u oficiales, ni con plataformas de intercambio secundario, salvo como operador registrado en sus respectivos canales.</p>
+        <p>Todas las marcas, nombres comerciales y logotipos de artistas o recintos mostrados en este sitio web se utilizan con fines exclusivamente descriptivos e informativos sobre los eventos gestionados.</p>
+      `,
+      en: `
+        <h4>1. Corporate Identification</h4>
+        <p>This website (<strong>holdtix.com</strong>) is owned and operated by <strong>HoldTix Operations LLC</strong>, a registered company in the United States. For any inquiries, official communications, or customer support, please contact us at <a href="mailto:contact@holdtix.com" style="color:var(--foil)">contact@holdtix.com</a>.</p>
+        
+        <h4>2. Business Activity</h4>
+        <p>HoldTix Operations LLC operates as an independent ticket broker and concierge in the secondary market. We specialize in sourcing and securing verified tickets for sold-out sports events, concerts, and live entertainment on behalf of our clients.</p>
+        
+        <h4>3. Disclaimer of Non-Affiliation</h4>
+        <p>HoldTix Operations LLC is an independent marketplace participant. We are not officially affiliated with, endorsed by, sponsored by, or associated with any event organizer, promoter, artist, venue, primary ticketing agent, or secondary marketplace, other than participating as an independent registered seller.</p>
+        <p>All trademarks, logos, and event/artist names referenced herein are used solely for descriptive purposes to identify the tickets being requested or supplied.</p>
+      `
+    }
+  },
+  privacidad: {
+    title: { es: "Política de Privacidad", en: "Privacy Policy" },
+    body: {
+      es: `
+        <h4>1. Responsable del Tratamiento</h4>
+        <p>El responsable del tratamiento de los datos personales recabados a través de este sitio web es <strong>HoldTix Operations LLC</strong> (<a href="mailto:contact@holdtix.com" style="color:var(--foil)">contact@holdtix.com</a>).</p>
+        
+        <h4>2. Datos Recopilados y Finalidad</h4>
+        <p>A través de nuestro formulario de solicitud y canales de contacto directo, recopilamos únicamente los datos necesarios para gestionar su encargo: nombre, dirección de correo electrónico y detalles relativos al evento o entradas solicitadas.</p>
+        <p>La finalidad exclusiva del tratamiento es gestionar su petición de disponibilidad y presupuesto, coordinar la entrega de las entradas y atender dudas relacionadas con su compra.</p>
+        
+        <h4>3. Conservación y Cesión de Datos</h4>
+        <p>No comercializamos ni cedemos sus datos personales a terceros con fines publicitarios. Sus datos únicamente se comparten con proveedores de servicios esenciales para la ejecución de la orden (proveedores logísticos de transferencia de entradas oficiales cuando proceda).</p>
+        
+        <h4>4. Derechos del Usuario</h4>
+        <p>Usted puede ejercer en cualquier momento sus derechos de acceso, rectificación, cancelación y oposición enviando una solicitud por escrito a <a href="mailto:contact@holdtix.com" style="color:var(--foil)">contact@holdtix.com</a>.</p>
+      `,
+      en: `
+        <h4>1. Data Controller</h4>
+        <p>The entity responsible for processing personal data collected via this website is <strong>HoldTix Operations LLC</strong> (<a href="mailto:contact@holdtix.com" style="color:var(--foil)">contact@holdtix.com</a>).</p>
+        
+        <h4>2. Data Collected and Purpose</h4>
+        <p>We only collect information strictly necessary to process your ticket inquiries and orders, including your name, email address, and ticket preference specifications. We use this information solely to communicate availability, provide quotes, facilitate ticket delivery, and provide customer support.</p>
+        
+        <h4>3. Data Sharing and Retention</h4>
+        <p>We do not sell, rent, or trade your personal information. Data is shared exclusively with necessary third-party service providers (such as secure verified ticketing transfer apps) to complete requested orders.</p>
+        
+        <h4>4. User Rights</h4>
+        <p>You have the right to request access to, correction of, or deletion of your personal data at any time by contacting us at <a href="mailto:contact@holdtix.com" style="color:var(--foil)">contact@holdtix.com</a>.</p>
+      `
+    }
+  },
+  terminos: {
+    title: { es: "Términos y Condiciones de Servicio", en: "Terms of Service" },
+    body: {
+      es: `
+        <h4>1. Proceso de Contratación y Fijación de Precios</h4>
+        <p>El envío de una solicitud de presupuesto a través de holdtix.com no constituye una obligación de compra ni un contrato vinculante. Una vez recibida la solicitud, HoldTix Operations LLC localizará las entradas correspondientes y presentará una oferta cerrada con zona y precio total.</p>
+        <p>Los precios ofertados en el mercado secundario pueden ser superiores o inferiores al valor nominal impreso en la entrada original, reflejando el coste de adquisición, la alta demanda de eventos con localidades agotadas y los costes de gestión.</p>
+        
+        <h4>2. Plazos y Métodos de Entrega</h4>
+        <p>Las entradas serán enviadas o transferidas al comprador con la debida antelación antes de la apertura de puertas del evento. El método de entrega (transferencia digital en app oficial del evento/recinto, PDF nominativo o entrada móvil) se confirmará en el momento de la oferta.</p>
+        
+        <h4>3. Garantía y Política de Reembolsos</h4>
+        <p>HoldTix garantiza la autenticidad y validez de cada entrada facilitada. En el caso excepcional de que una entrada debidamente gestionada no permitiese el acceso al recinto por causas atribuibles a la misma, o si el evento fuera cancelado definitivamente por el organizador sin fecha de aplazamiento, el cliente tendrá derecho al reembolso íntegro del importe abonado.</p>
+        <p><strong>Canal de compra:</strong> Dicha garantía y gestión directa de reembolsos aplica exclusivamente a encargos tramitados y abonados directamente con nosotros. Si la compra se ha realizado a través de un intermediario o plataforma externa (como Viagogo, StubHub o similares), cualquier solicitud de asistencia, reclamación o reembolso estará sujeta a sus condiciones y deberá gestionarse a través del soporte oficial de dicha plataforma.</p>
+      `,
+      en: `
+        <h4>1. Sourcing Process & Market Pricing</h4>
+        <p>Submitting an inquiry through holdtix.com does not constitute a binding purchase contract. Upon receiving your request, HoldTix Operations LLC identifies suitable tickets and provides a confirmed offer with exact section and all-inclusive pricing.</p>
+        <p>Prices in the secondary ticket market reflect current market demand, procurement costs, and service fees, and may be higher or lower than the face value printed on the ticket.</p>
+        
+        <h4>2. Delivery Commitments</h4>
+        <p>Tickets are delivered safely prior to venue doors opening. Delivery mechanisms (official mobile app transfer, PDF e-ticket, or verified mobile pass) are communicated clearly before payment is finalized.</p>
+        
+        <h4>3. Guarantee & Refund Policy</h4>
+        <p>HoldTix guarantees valid and authentic entry for every fulfilled order. In the unlikely event that a valid ticket is not delivered in time, fails to grant entry due to invalid credentials, or the event is permanently cancelled without a rescheduled date, a 100% full refund is issued promptly.</p>
+        <p><strong>Purchasing channel:</strong> Direct guarantees and refund processing apply strictly to orders placed and paid directly with HoldTix. If the purchase was completed through a third-party intermediary or marketplace (such as Viagogo, StubHub, or similar platforms), any support requests, disputes, or refunds remain subject to that platform's terms and must be handled directly with their customer support.</p>
+      `
+    }
+  }
+};
+
+const modalOverlay = $("#modalOverlay");
+const modalTitle = $("#modalTitle");
+const modalBody = $("#modalBody");
+const modalClose = $("#modalClose");
+
+function abrirModalLegal(tipo){
+  const item = legalContent[tipo];
+  if (!item) return;
+  modalTitle.textContent = item.title[idioma] || item.title.en;
+  modalBody.innerHTML = item.body[idioma] || item.body.en;
+  modalOverlay.classList.add("open");
+  modalOverlay.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+}
+
+function cerrarModalLegal(){
+  modalOverlay.classList.remove("open");
+  modalOverlay.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+}
+
+$$(".legal-link").forEach(link => {
+  link.addEventListener("click", e => {
+    e.preventDefault();
+    const tipo = link.dataset.modal;
+    abrirModalLegal(tipo);
+  });
+});
+
+modalClose.addEventListener("click", cerrarModalLegal);
+modalOverlay.addEventListener("click", e => {
+  if (e.target === modalOverlay) cerrarModalLegal();
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && modalOverlay.classList.contains("open")) cerrarModalLegal();
 });
 
 /* --- Arranque --- */
