@@ -9,6 +9,13 @@
 <meta property="og:description" content="Verified resale and made-to-order requests. Delivered before doors open.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://holdtix.com">
+<link rel="canonical" href="https://holdtix.com">
+<meta name="theme-color" content="#0A0C18">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23F0C463'/%3E%3Cstop offset='100%25' stop-color='%23A98432'/%3E%3C/linearGradient%3E%3Cmask id='m'%3E%3Crect width='32' height='32' rx='6' fill='%23fff'/%3E%3Ccircle cx='0' cy='16' r='5' fill='%23000'/%3E%3Ccircle cx='32' cy='16' r='5' fill='%23000'/%3E%3C/mask%3E%3C/defs%3E%3Crect width='32' height='32' rx='6' fill='url(%23g)' mask='url(%23m)'/%3E%3C/svg%3E">
+<meta property="og:site_name" content="HoldTix">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="HoldTix — Tickets for sold-out events">
+<meta name="twitter:description" content="Verified resale and made-to-order requests. Delivered before doors open.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62.5..125,100..900&family=JetBrains+Mono:wght@400;500;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -82,7 +89,7 @@ p{ margin:0; }
 
 .eyebrow{
   font-family:var(--f-mono);
-  font-size:.7rem;
+  font-size:.74rem;
   letter-spacing:.22em;
   text-transform:uppercase;
   color:var(--foil);
@@ -226,6 +233,10 @@ p{ margin:0; }
   transition:transform .45s cubic-bezier(.2,.7,.3,1);
   overflow:hidden;
 }
+.ticket.ticket--active{
+  border-color:var(--foil);
+  box-shadow:0 34px 70px -20px rgba(224,178,76,.2), 0 0 0 1px rgba(224,178,76,.25);
+}
 .ticket__top{ padding:22px 24px 20px; }
 .ticket__hdr{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
 .ticket__brand{
@@ -236,17 +247,18 @@ p{ margin:0; }
 .ticket__event{
   font-family:var(--f-display); font-stretch:120%; font-weight:800;
   font-size:1.72rem; line-height:1.04; margin:16px 0 6px;
+  transition:color .25s ease;
 }
-.ticket__venue{ color:var(--muted); font-size:.88rem; }
+.ticket__venue{ color:var(--muted); font-size:.88rem; transition:color .25s ease; }
 .ticket__fields{
   display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:22px;
 }
 .ticket__fields > div{ min-width:0; }
 .field__k{
-  font-family:var(--f-mono); font-size:.6rem; letter-spacing:.2em;
+  font-family:var(--f-mono); font-size:.68rem; letter-spacing:.2em;
   text-transform:uppercase; color:var(--muted); display:block; margin-bottom:4px;
 }
-.field__v{ font-family:var(--f-mono); font-size:.88rem; font-weight:700; line-height:1.25; }
+.field__v{ font-family:var(--f-mono); font-size:.88rem; font-weight:700; line-height:1.25; transition:color .25s ease; }
 .ticket__holo{ height:5px; margin:22px -24px 0; }
 .ticket__bottom{
   padding:20px 24px 22px; display:flex; align-items:center; justify-content:space-between; gap:14px;
@@ -278,7 +290,7 @@ p{ margin:0; }
   -webkit-background-clip:text; background-clip:text; color:transparent;
 }
 .stat__l{
-  font-family:var(--f-mono); font-size:.66rem; letter-spacing:.16em;
+  font-family:var(--f-mono); font-size:.72rem; letter-spacing:.16em;
   text-transform:uppercase; color:var(--muted); margin-top:10px;
 }
 
@@ -318,9 +330,24 @@ p{ margin:0; }
   background:var(--ink-2); border:1px solid var(--edge);
   border-left:3px solid var(--foil-dim);
   border-radius:var(--r-sm); padding:15px 17px;
-  transition:border-color .2s ease, transform .2s ease;
+  transition:border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+  cursor:pointer;
 }
-.ev:hover{ border-color:var(--edge); border-left-color:var(--foil); transform:translateY(-2px); }
+.ev:hover{ border-color:var(--edge); border-left-color:var(--foil); transform:translateY(-2px); box-shadow:0 10px 24px -10px rgba(0,0,0,.7); }
+.ev:focus-visible{ outline:2px solid var(--holo); outline-offset:2px; }
+.ev__action{
+  display:inline-block; font-family:var(--f-mono); font-size:.66rem;
+  letter-spacing:.08em; text-transform:uppercase; color:var(--holo);
+  margin-top:5px; opacity:.85; transition:opacity .18s;
+}
+.ev:hover .ev__action{ opacity:1; color:var(--foil); }
+.avail__empty-box{
+  background:var(--ink-2); border:1px dashed var(--edge); border-radius:var(--r-lg);
+  padding:36px 24px; text-align:center; max-width:680px; margin:0 auto;
+}
+.empty-icon{ font-size:1.8rem; margin-bottom:10px; }
+.empty-title{ font-family:var(--f-display); font-size:1.2rem; font-weight:700; margin-bottom:8px; }
+.empty-desc{ color:var(--muted); font-size:.94rem; margin-bottom:20px; max-width:52ch; margin-inline:auto; }
 .ev__main{ min-width:0; flex:1; }
 .ev__n{
   font-family:var(--f-display); font-stretch:114%; font-weight:800;
@@ -390,9 +417,17 @@ p{ margin:0; }
   font-family:var(--f-display); font-stretch:118%; font-weight:800;
   font-size:clamp(1.55rem,4.4vw,3rem);
   letter-spacing:-.015em; white-space:nowrap; line-height:1.16;
-  transition:color .2s ease;
+  transition:color .2s ease, transform .2s ease;
+  cursor:pointer;
 }
 .mq .name:hover{ color:var(--foil); }
+.name--btn{
+  background:none; border:none; padding:0; margin:0; font:inherit; color:inherit; text-align:inherit; cursor:pointer;
+}
+.name--btn:focus-visible{
+  outline:2px solid var(--holo); outline-offset:4px; border-radius:4px;
+}
+.name--btn:active{ transform:scale(0.96); }
 .mq .sep{
   color:var(--foil); opacity:.5; padding:0 .5em; flex:none;
   font-size:clamp(.85rem,1.8vw,1.25rem); vertical-align:.2em;
@@ -482,12 +517,80 @@ p{ margin:0; }
 .gitem h3{ font-size:1rem; margin-bottom:5px; }
 .gitem p{ color:var(--muted); font-size:.9rem; }
 
+/* ---- Franja de Confianza y Pasarelas de Pago ---- */
+.trust-grid{
+  display:grid; grid-template-columns:.9fr 1.1fr; gap:clamp(32px, 5vw, 64px);
+  margin-top:clamp(36px, 5vw, 56px);
+  align-items:stretch;
+}
+@media (max-width:960px){
+  .trust-grid{ grid-template-columns:1fr; }
+}
+.trust-card{
+  background:var(--ink-2); border:1px solid var(--edge); border-radius:var(--r-lg);
+  padding:26px 24px; display:flex; flex-direction:column; justify-content:space-between;
+}
+.trust-card__badge{
+  display:inline-block; font-family:var(--f-mono); font-size:.66rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--holo);
+  background:rgba(111,227,212,.08); border:1px solid rgba(111,227,212,.22);
+  padding:3px 9px; border-radius:99px; margin-bottom:12px;
+}
+.trust-card h3{
+  font-size:1.15rem; margin:0 0 8px;
+}
+.trust-card p{
+  color:var(--muted); font-size:.9rem; line-height:1.55; margin:0 0 18px;
+}
+.pill-row{
+  display:flex; flex-wrap:wrap; gap:8px;
+}
+.pill{
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(255,255,255,.03); border:1px solid var(--edge);
+  border-radius:6px; padding:6px 10px; font-family:var(--f-mono);
+  font-size:.72rem; color:var(--paper); letter-spacing:.03em;
+}
+.pill svg{ color:var(--holo); flex:none; }
+
 /* ============================================================
-   FORMULARIO
+   FORMULARIO Y TICKET FLOTANTE
    ============================================================ */
+.solicitar-layout{
+  display:grid; grid-template-columns:1.16fr .84fr; gap:clamp(32px,4vw,56px);
+  align-items:start;
+}
 .form-wrap{
   background:var(--ink-2); border:1px solid var(--edge); border-radius:var(--r-lg);
   padding:clamp(26px,3.6vw,44px);
+}
+.form-aside{ min-width:0; }
+.form-aside__sticky{
+  position:sticky; top:88px;
+  display:flex; flex-direction:column; gap:16px;
+}
+.form-aside__label{
+  font-family:var(--f-mono); font-size:.72rem; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--muted);
+  display:flex; align-items:center; gap:8px;
+}
+.form-aside__hint{
+  font-size:.82rem; color:var(--muted); line-height:1.55;
+  border-left:2px solid var(--edge); padding-left:14px;
+}
+.ticket--aside{
+  background:linear-gradient(168deg, #171d3a, #0e1224);
+}
+@media (max-width:960px){
+  .solicitar-layout{ grid-template-columns:1fr; }
+  .form-aside{ order:-1; margin-bottom:8px; }
+}
+@keyframes inputFlash{
+  0%{ background:rgba(224,178,76,.28); border-color:var(--foil); box-shadow:0 0 18px rgba(224,178,76,.4); }
+  100%{ background:var(--ink); border-color:var(--foil); box-shadow:none; }
+}
+.input--flash{
+  animation:inputFlash 1.2s ease-out !important;
 }
 .form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 .f-full{ grid-column:1/-1; }
@@ -698,6 +801,69 @@ details p{ color:var(--muted); font-size:.94rem; padding-bottom:22px; max-width:
 .modal-body li{ margin-bottom:6px; }
 
 </style>
+
+<!-- Datos estructurados Schema.org (Organization + FAQPage para Rich Snippets en Google) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://holdtix.com/#organization",
+      "name": "HoldTix Operations LLC",
+      "url": "https://holdtix.com",
+      "email": "contact@holdtix.com",
+      "description": "Specialized concierge and independent ticket sourcing for sold-out sports, concert, and live entertainment events."
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://holdtix.com/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "¿Cuándo pago? / When do I pay?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Después de que te enviemos la oferta con zona y precio total cerrado, y solo si la aceptas. No pedimos depósitos para empezar a buscar. / After we send you the offer with section and locked total price, and only if you accept it."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Por qué cuesta más que el precio original? / Why is it more than face value?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Porque la entrada ya no está a la venta en el canal oficial. El precio refleja lo que cuesta conseguirla en el mercado secundario más nuestro margen, y lo ves entero antes de pagar: nunca hay cargos añadidos al final."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cómo recibo la entrada? / How do I receive the ticket?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Depende del recinto: transferencia nominativa dentro de la app oficial (Ticketmaster, AXS, DICE...), PDF con código o entrada móvil segura. Te decimos el método exacto en la oferta, antes de que pagues."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Y si se cancela o se aplaza el evento? / What if the event is cancelled or postponed?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Si se cancela, devolvemos el importe íntegro. Si se aplaza, la entrada suele mantener validez para la nueva fecha; si no te sirve, buscamos alternativa o devolución según el caso."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Puedo pedir un evento que no aparece en la web? / Can I request an event not listed here?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sí, es la mayor parte de nuestro trabajo. Dinos qué evento buscas y salimos a buscarlo a través de nuestra red de proveedores contrastados."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
 </head>
 
 <body>
@@ -756,18 +922,18 @@ details p{ color:var(--muted); font-size:.94rem; padding-bottom:22px; max-width:
             <span class="ticket__brand">HoldTix · <span data-es="Encargo confirmado" data-en="Order confirmed">Encargo confirmado</span></span>
             <span class="ticket__serial" id="tkSerial">HTX-0000</span>
           </div>
-          <h2 class="ticket__event" data-es="Tu evento" data-en="Your event">Tu evento</h2>
-          <p class="ticket__venue" data-es="Agotado en el canal oficial" data-en="Sold out through official channels">Agotado en el canal oficial</p>
+          <h2 class="ticket__event" id="tkEvent" data-es="Tu evento" data-en="Your event">Tu evento</h2>
+          <p class="ticket__venue" id="tkVenue" data-es="Agotado en el canal oficial" data-en="Sold out through official channels">Agotado en el canal oficial</p>
           <div class="ticket__fields">
-            <div><span class="field__k" data-es="Estado" data-en="Status">Estado</span><span class="field__v" data-es="Localizado" data-en="Located">Localizado</span></div>
-            <div><span class="field__k" data-es="Precio" data-en="Price">Precio</span><span class="field__v" data-es="Cerrado" data-en="Locked">Cerrado</span></div>
-            <div><span class="field__k" data-es="Entrega" data-en="Delivery">Entrega</span><span class="field__v" data-es="Antes de puertas" data-en="Before doors">Antes de puertas</span></div>
+            <div><span class="field__k" data-es="Estado" data-en="Status">Estado</span><span class="field__v" id="tkStatus" data-es="Localizado" data-en="Located">Localizado</span></div>
+            <div><span class="field__k" data-es="Precio" data-en="Price">Precio</span><span class="field__v" id="tkPrice" data-es="Cerrado" data-en="Locked">Cerrado</span></div>
+            <div><span class="field__k" data-es="Entrega" data-en="Delivery">Entrega</span><span class="field__v" id="tkDelivery" data-es="Antes de puertas" data-en="Before doors">Antes de puertas</span></div>
           </div>
           <div class="ticket__holo holo-strip"></div>
         </div>
         <div class="perf"></div>
         <div class="ticket__bottom">
-          <span class="ticket__status">◆ <span data-es="Listo para entregar" data-en="Ready to deliver">Listo para entregar</span></span>
+          <span class="ticket__status" id="tkBottomStatus">◆ <span data-es="Listo para entregar" data-en="Ready to deliver">Listo para entregar</span></span>
           <div class="barcode" id="barcode" aria-hidden="true"></div>
         </div>
       </article>
@@ -882,52 +1048,90 @@ details p{ color:var(--muted); font-size:.94rem; padding-bottom:22px; max-width:
 
 <!-- ══════════════ GARANTÍA ══════════════ -->
 <section class="section" id="garantia">
-  <div class="shell guard">
-    <div class="rv">
-      <p class="eyebrow" data-es="Por qué fiarte" data-en="Why trust us">Por qué fiarte</p>
-      <h2 data-es="Cuatro compromisos por escrito" data-en="Four commitments in writing">Cuatro compromisos por escrito</h2>
-      <p class="lede" style="margin-top:16px"
-         data-es="Comprar entradas de reventa da respeto, y con razón. Por eso cada operación de HoldTix se apoya en las mismas cuatro reglas, y las tienes por escrito antes de pagar."
-         data-en="Buying resale tickets makes people nervous, and rightly so. That's why every HoldTix order rests on the same four rules, and you get them in writing before you pay.">
-        Comprar entradas de reventa da respeto, y con razón. Por eso cada operación de HoldTix se apoya en las mismas cuatro reglas, y las tienes por escrito antes de pagar.
-      </p>
+  <div class="shell">
+    <div class="guard">
+      <div class="rv">
+        <p class="eyebrow" data-es="Por qué fiarte" data-en="Why trust us">Por qué fiarte</p>
+        <h2 data-es="Cuatro compromisos por escrito" data-en="Four commitments in writing">Cuatro compromisos por escrito</h2>
+        <p class="lede" style="margin-top:16px"
+           data-es="Comprar entradas de reventa da respeto, y con razón. Por eso cada operación de HoldTix se apoya en las mismas cuatro reglas, y las tienes por escrito antes de pagar."
+           data-en="Buying resale tickets makes people nervous, and rightly so. That's why every HoldTix order rests on the same four rules, and you get them in writing before you pay.">
+          Comprar entradas de reventa da respeto, y con razón. Por eso cada operación de HoldTix se apoya en las mismas cuatro reglas, y las tienes por escrito antes de pagar.
+        </p>
+      </div>
+
+      <div class="guard__list rv">
+        <div class="gitem">
+          <span class="gitem__i">01</span>
+          <div>
+            <h3 data-es="Nada se cobra sin entrada localizada" data-en="Nothing is charged without a located ticket">Nada se cobra sin entrada localizada</h3>
+            <p data-es="Solo pides el pago cuando ya tenemos la entrada identificada, con zona y precio final. Sin depósitos a ciegas."
+               data-en="You only pay once we have the ticket identified, with section and final price. No blind deposits.">
+              Solo pides el pago cuando ya tenemos la entrada identificada, con zona y precio final. Sin depósitos a ciegas.</p>
+          </div>
+        </div>
+        <div class="gitem">
+          <span class="gitem__i">02</span>
+          <div>
+            <h3 data-es="Entrega antes de puertas" data-en="Delivery before doors">Entrega antes de puertas</h3>
+            <p data-es="Recibes la entrada con antelación al evento. Si no llega a tiempo, devolución íntegra."
+               data-en="You receive the ticket ahead of the event. If it doesn't arrive in time, full refund.">
+              Recibes la entrada con antelación al evento. Si no llega a tiempo, devolución íntegra.</p>
+          </div>
+        </div>
+        <div class="gitem">
+          <span class="gitem__i">03</span>
+          <div>
+            <h3 data-es="Si no da acceso, se devuelve" data-en="No entry, full refund">Si no da acceso, se devuelve</h3>
+            <p data-es="Si una entrada no permite el acceso al recinto, devolvemos el importe pagado. Sin discusiones."
+               data-en="If a ticket doesn't grant entry to the venue, we refund what you paid. No arguments.">
+              Si una entrada no permite el acceso al recinto, devolvemos el importe pagado. Sin discusiones.</p>
+          </div>
+        </div>
+        <div class="gitem">
+          <span class="gitem__i">04</span>
+          <div>
+            <h3 data-es="Empresa registrada, no un perfil anónimo" data-en="A registered company, not an anonymous profile">Empresa registrada, no un perfil anónimo</h3>
+            <p data-es="Operamos como HoldTix Operations LLC, con dirección fiscal y facturación. Sabes con quién estás tratando."
+               data-en="We operate as HoldTix Operations LLC, with a registered address and invoicing. You know who you're dealing with.">
+              Operamos como HoldTix Operations LLC, con dirección fiscal y facturación. Sabes con quién estás tratando.</p>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="guard__list rv">
-      <div class="gitem">
-        <span class="gitem__i">01</span>
-        <div>
-          <h3 data-es="Nada se cobra sin entrada localizada" data-en="Nothing is charged without a located ticket">Nada se cobra sin entrada localizada</h3>
-          <p data-es="Solo pides el pago cuando ya tenemos la entrada identificada, con zona y precio final. Sin depósitos a ciegas."
-             data-en="You only pay once we have the ticket identified, with section and final price. No blind deposits.">
-            Solo pides el pago cuando ya tenemos la entrada identificada, con zona y precio final. Sin depósitos a ciegas.</p>
+    <div class="trust-grid rv">
+      <div class="trust-card">
+        <div class="trust-card__header">
+          <span class="trust-card__badge" data-es="Transferencia 100% Oficial" data-en="100% Official Transfer">Transferencia 100% Oficial</span>
+          <h3 data-es="Formatos de entrega verificados" data-en="Verified Delivery Formats">Formatos de entrega verificados</h3>
+        </div>
+        <p data-es="Entradas transferidas a tu nombre directamente en la plataforma oficial del evento o en formato digital seguro antes de la apertura de puertas."
+           data-en="Tickets transferred in your name directly within the official event platform or as verified secure digital pass before doors open.">
+          Entradas transferidas a tu nombre directamente en la plataforma oficial del evento o en formato digital seguro antes de la apertura de puertas.
+        </p>
+        <div class="pill-row">
+          <span class="pill"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Ticketmaster Transfer</span>
+          <span class="pill"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> AXS Mobile ID</span>
+          <span class="pill"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> DICE Mobile Pass</span>
+          <span class="pill"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> PDF / Wallet Nominativo</span>
         </div>
       </div>
-      <div class="gitem">
-        <span class="gitem__i">02</span>
-        <div>
-          <h3 data-es="Entrega antes de puertas" data-en="Delivery before doors">Entrega antes de puertas</h3>
-          <p data-es="Recibes la entrada con antelación al evento. Si no llega a tiempo, devolución íntegra."
-             data-en="You receive the ticket ahead of the event. If it doesn't arrive in time, full refund.">
-            Recibes la entrada con antelación al evento. Si no llega a tiempo, devolución íntegra.</p>
+
+      <div class="trust-card">
+        <div class="trust-card__header">
+          <span class="trust-card__badge" data-es="Cobro solo tras confirmación" data-en="Charged Only Upon Confirmation">Cobro solo tras confirmación</span>
+          <h3 data-es="Pagos protegidos y transparentes" data-en="Protected & Transparent Payments">Pagos protegidos y transparentes</h3>
         </div>
-      </div>
-      <div class="gitem">
-        <span class="gitem__i">03</span>
-        <div>
-          <h3 data-es="Si no da acceso, se devuelve" data-en="No entry, full refund">Si no da acceso, se devuelve</h3>
-          <p data-es="Si una entrada no permite el acceso al recinto, devolvemos el importe pagado. Sin discusiones."
-             data-en="If a ticket doesn't grant entry to the venue, we refund what you paid. No arguments.">
-            Si una entrada no permite el acceso al recinto, devolvemos el importe pagado. Sin discusiones.</p>
-        </div>
-      </div>
-      <div class="gitem">
-        <span class="gitem__i">04</span>
-        <div>
-          <h3 data-es="Empresa registrada, no un perfil anónimo" data-en="A registered company, not an anonymous profile">Empresa registrada, no un perfil anónimo</h3>
-          <p data-es="Operamos como HoldTix Operations LLC, con dirección fiscal y facturación. Sabes con quién estás tratando."
-             data-en="We operate as HoldTix Operations LLC, with a registered address and invoicing. You know who you're dealing with.">
-            Operamos como HoldTix Operations LLC, con dirección fiscal y facturación. Sabes con quién estás tratando.</p>
+        <p data-es="Sin adelantos para buscar. Cuando confirmes la oferta con zona y precio cerrado, pagas mediante pasarelas cifradas con total protección al comprador."
+           data-en="No upfront deposits to search. Once you accept a confirmed offer with section and locked price, you pay via encrypted gateways with full buyer protection.">
+          Sin adelantos para buscar. Cuando confirmes la oferta con zona y precio cerrado, pagas mediante pasarelas cifradas con total protección al comprador.
+        </p>
+        <div class="pill-row">
+          <span class="pill"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg> Stripe / 3D Secure</span>
+          <span class="pill">Visa · Mastercard · Amex</span>
+          <span class="pill">Apple Pay / Google Pay</span>
+          <span class="pill">Transferencia SEPA</span>
         </div>
       </div>
     </div>
@@ -947,60 +1151,101 @@ details p{ color:var(--muted); font-size:.94rem; padding-bottom:22px; max-width:
       </p>
     </div>
 
-    <div class="form-wrap rv">
-      <form id="reqForm" novalidate>
-        <div class="form-grid">
-          <div class="f-full">
-            <label for="ev" data-es="Evento, artista o partido" data-en="Event, artist or match">Evento, artista o partido</label>
-            <input id="ev" name="evento" required data-es-ph="Ej. Coldplay, Estadio Olímpico" data-en-ph="e.g. Coldplay, Olympic Stadium" placeholder="Ej. Coldplay, Estadio Olímpico">
+    <div class="solicitar-layout rv">
+      <div class="form-wrap">
+        <form id="reqForm" novalidate>
+          <div class="form-grid">
+            <div class="f-full">
+              <label for="ev" data-es="Evento, artista o partido" data-en="Event, artist or match">Evento, artista o partido</label>
+              <input id="ev" name="evento" required data-es-ph="Ej. Coldplay, Estadio Olímpico" data-en-ph="e.g. Coldplay, Olympic Stadium" placeholder="Ej. Coldplay, Estadio Olímpico">
+            </div>
+            <div>
+              <label for="ciudad" data-es="Ciudad o recinto" data-en="City or venue">Ciudad o recinto</label>
+              <input id="ciudad" name="ciudad" data-es-ph="Ej. Madrid" data-en-ph="e.g. Madrid" placeholder="Ej. Madrid">
+            </div>
+            <div>
+              <label for="fecha" data-es="Fecha del evento" data-en="Event date">Fecha del evento</label>
+              <input id="fecha" name="fecha" type="date">
+            </div>
+            <div>
+              <label for="uds" data-es="Número de entradas" data-en="Number of tickets">Número de entradas</label>
+              <select id="uds" name="unidades">
+                <option>1</option><option selected>2</option><option>3</option>
+                <option>4</option><option>5</option><option>6+</option>
+              </select>
+            </div>
+            <div>
+              <label for="presu" data-es="Presupuesto máx. por entrada" data-en="Max budget per ticket">Presupuesto máx. por entrada</label>
+              <input id="presu" name="presupuesto" data-es-ph="Ej. 250 €" data-en-ph="e.g. €250" placeholder="Ej. 250 €">
+            </div>
+            <div>
+              <label for="nombre" data-es="Tu nombre" data-en="Your name">Tu nombre</label>
+              <input id="nombre" name="nombre" required>
+            </div>
+            <div>
+              <label for="contacto" data-es="Tu email" data-en="Your email">Tu email</label>
+              <input id="contacto" name="contacto" type="email" required data-es-ph="Para responderte" data-en-ph="So we can reply" placeholder="Para responderte">
+            </div>
+            <div class="f-full">
+              <label for="notas" data-es="Detalles (zona preferida, flexibilidad de fecha…)" data-en="Details (preferred section, date flexibility…)">Detalles (zona preferida, flexibilidad de fecha…)</label>
+              <textarea id="notas" name="notas"></textarea>
+            </div>
+            <div class="f-full trampa" aria-hidden="true">
+              <label for="empresa">Empresa</label>
+              <input id="empresa" name="empresa" tabindex="-1" autocomplete="off">
+            </div>
+            <div class="f-full">
+              <button class="btn btn--gold btn--block" type="submit" data-es="Enviar solicitud" data-en="Send request">Enviar solicitud</button>
+            </div>
           </div>
-          <div>
-            <label for="ciudad" data-es="Ciudad o recinto" data-en="City or venue">Ciudad o recinto</label>
-            <input id="ciudad" name="ciudad" data-es-ph="Ej. Madrid" data-en-ph="e.g. Madrid" placeholder="Ej. Madrid">
+          <p class="form-note"
+             data-es="Usamos tus datos solo para responder a esta solicitud. Nunca pedimos el pago antes de confirmar disponibilidad."
+             data-en="We use your details only to answer this request. We never ask for payment before confirming availability.">
+            Usamos tus datos solo para responder a esta solicitud. Nunca pedimos el pago antes de confirmar disponibilidad.
+          </p>
+          <p class="form-msg" id="formMsg" hidden></p>
+          <div class="form-fallback" id="formFallback" hidden></div>
+        </form>
+      </div>
+
+      <aside class="form-aside">
+        <div class="form-aside__sticky">
+          <div class="form-aside__label">
+            <span class="dot"></span>
+            <span data-es="Pase en tiempo real" data-en="Live pass preview">Pase en tiempo real</span>
           </div>
-          <div>
-            <label for="fecha" data-es="Fecha del evento" data-en="Event date">Fecha del evento</label>
-            <input id="fecha" name="fecha" type="date">
+
+          <div class="ticket-wrap ticket-wrap--aside">
+            <article class="ticket ticket--aside" id="formTicket">
+              <div class="ticket__top">
+                <div class="ticket__hdr">
+                  <span class="ticket__brand">HoldTix · <span data-es="Encargo en curso" data-en="Order in progress">Encargo en curso</span></span>
+                  <span class="ticket__serial" id="formTkSerial">HTX-0000</span>
+                </div>
+                <h2 class="ticket__event" id="formTkEvent" data-es="Tu evento" data-en="Your event">Tu evento</h2>
+                <p class="ticket__venue" id="formTkVenue" data-es="Agotado en el canal oficial" data-en="Sold out through official channels">Agotado en el canal oficial</p>
+                <div class="ticket__fields">
+                  <div><span class="field__k" data-es="Estado" data-en="Status">Estado</span><span class="field__v" id="formTkStatus" data-es="Solicitado" data-en="Requested">Solicitado</span></div>
+                  <div><span class="field__k" data-es="Entradas" data-en="Tickets">Entradas</span><span class="field__v" id="formTkPrice" data-es="2 entradas" data-en="2 tickets">2 entradas</span></div>
+                  <div><span class="field__k" data-es="Entrega" data-en="Delivery">Entrega</span><span class="field__v" id="formTkDelivery" data-es="Antes de puertas" data-en="Before doors">Antes de puertas</span></div>
+                </div>
+                <div class="ticket__holo holo-strip"></div>
+              </div>
+              <div class="perf"></div>
+              <div class="ticket__bottom">
+                <span class="ticket__status" id="formTkBottomStatus">◆ <span data-es="Listo para enviar" data-en="Ready to submit">Listo para enviar</span></span>
+                <div class="barcode barcode--aside" id="formBarcode" aria-hidden="true"></div>
+              </div>
+            </article>
           </div>
-          <div>
-            <label for="uds" data-es="Número de entradas" data-en="Number of tickets">Número de entradas</label>
-            <select id="uds" name="unidades">
-              <option>1</option><option selected>2</option><option>3</option>
-              <option>4</option><option>5</option><option>6+</option>
-            </select>
-          </div>
-          <div>
-            <label for="presu" data-es="Presupuesto máx. por entrada" data-en="Max budget per ticket">Presupuesto máx. por entrada</label>
-            <input id="presu" name="presupuesto" data-es-ph="Ej. 250 €" data-en-ph="e.g. €250" placeholder="Ej. 250 €">
-          </div>
-          <div>
-            <label for="nombre" data-es="Tu nombre" data-en="Your name">Tu nombre</label>
-            <input id="nombre" name="nombre" required>
-          </div>
-          <div>
-            <label for="contacto" data-es="Tu email" data-en="Your email">Tu email</label>
-            <input id="contacto" name="contacto" type="email" required data-es-ph="Para responderte" data-en-ph="So we can reply" placeholder="Para responderte">
-          </div>
-          <div class="f-full">
-            <label for="notas" data-es="Detalles (zona preferida, flexibilidad de fecha…)" data-en="Details (preferred section, date flexibility…)">Detalles (zona preferida, flexibilidad de fecha…)</label>
-            <textarea id="notas" name="notas"></textarea>
-          </div>
-          <div class="f-full trampa" aria-hidden="true">
-            <label for="empresa">Empresa</label>
-            <input id="empresa" name="empresa" tabindex="-1" autocomplete="off">
-          </div>
-          <div class="f-full">
-            <button class="btn btn--gold btn--block" type="submit" data-es="Enviar solicitud" data-en="Send request">Enviar solicitud</button>
-          </div>
+
+          <p class="form-aside__hint"
+             data-es="Este pase se actualiza automáticamente con tus datos. Al enviar la petición empezamos la búsqueda sin coste previo."
+             data-en="This pass updates automatically with your data. Submitting initiates sourcing with zero upfront payment.">
+            Este pase se actualiza automáticamente con tus datos. Al enviar la petición empezamos la búsqueda sin coste previo.
+          </p>
         </div>
-        <p class="form-note"
-           data-es="Usamos tus datos solo para responder a esta solicitud. Nunca pedimos el pago antes de confirmar disponibilidad."
-           data-en="We use your details only to answer this request. We never ask for payment before confirming availability.">
-          Usamos tus datos solo para responder a esta solicitud. Nunca pedimos el pago antes de confirmar disponibilidad.
-        </p>
-        <p class="form-msg" id="formMsg" hidden></p>
-        <div class="form-fallback" id="formFallback" hidden></div>
-      </form>
+      </aside>
     </div>
   </div>
 </section>
@@ -1575,10 +1820,16 @@ function pintarLineup(){
     copia.className = "mq__copy";
     if (c === 1) copia.setAttribute("aria-hidden", "true");
     L.forEach(([nombre, n]) => {
-      const s = document.createElement("span");
-      s.className = "name";
+      const s = document.createElement("button");
+      s.type = "button";
+      s.className = "name name--btn";
       s.textContent = nombre;
-      s.title = `${n} ${idioma === "es" ? "entradas" : "tickets"}`;
+      const tlt = idioma === "es"
+        ? `Pedir entradas para ${nombre} (${n} gestionadas)`
+        : `Request tickets for ${nombre} (${n} handled)`;
+      s.title = tlt;
+      s.setAttribute("aria-label", tlt);
+      s.addEventListener("click", () => pedirEvento(nombre));
       copia.appendChild(s);
       const sp = document.createElement("span");
       sp.className = "sep"; sp.textContent = "◆";
@@ -1594,8 +1845,8 @@ function pintarLineup(){
     document.fonts.ready.then(() => ajustaVelocidad([track]));
 
   $("#lineupFoot").textContent = idioma === "es"
-    ? `Una selección de los ${S.artistas} artistas y eventos cubiertos · ${S.entradas} entradas gestionadas`
-    : `A selection from ${S.artistas} artists and events covered · ${S.entradas} tickets handled`;
+    ? `Una selección de los ${S.artistas} artistas y eventos cubiertos · ${S.entradas} entradas gestionadas · Clic en un artista para pedirlo`
+    : `A selection from ${S.artistas} artists and events covered · ${S.entradas} tickets handled · Click any artist to request`;
 }
 
 /* Aviso en consola: artistas con volumen alto que no están en el cartel.
@@ -1624,15 +1875,21 @@ function ajustaVelocidad(pistas){
 function pintarDisponible(){
   const sec = $("#disponible"), cont = $("#avail"), es = idioma === "es";
 
-  // Sin columna "Hoja" no se puede distinguir inventario de eventos pasados.
-  if (!S.libres){ sec.hidden = true; return; }
+  // Siempre visible para dar opción de catálogo o de encargo
   sec.hidden = false;
 
-  if (!S.libres.length){
-    cont.innerHTML = `<p class="avail__vacio">` + (es
-      ? "Ahora mismo no tenemos entradas sin asignar. Dinos qué evento buscas y salimos a por él."
-      : "Right now we have no unassigned tickets. Tell us which event you need and we'll go get it.") + `</p>`;
-    $("#availFoot").textContent = "";
+  if (!S.libres || !S.libres.length){
+    cont.innerHTML = `
+      <div class="avail__empty-box">
+        <div class="empty-icon">⚡</div>
+        <p class="empty-title">${es ? "Entradas disponibles bajo demanda" : "Tickets sourced made-to-order"}</p>
+        <p class="empty-desc">${es ? "El 90% de nuestras operaciones se realizan por encargo personalizado. Dinos qué artista, evento o partido buscas y te enviamos localidades confirmadas en menos de 2 horas." : "90% of our orders are sourced directly on request. Tell us which artist, match or event you need and we will send confirmed options in under 2 hours."}</p>
+        <a class="btn btn--gold" href="#solicitar">${es ? "Pedir mi evento ahora" : "Request my event now"}</a>
+      </div>`;
+    $("#availFoot").textContent = es
+      ? "Localización directa sin compromiso de compra · Precio cerrado antes de pagar"
+      : "Direct sourcing with no upfront commitment · Locked price before you pay";
+    observarRevelado();
     return;
   }
 
@@ -1644,14 +1901,34 @@ function pintarDisponible(){
     const etiq = e.fechas.length > 1
       ? `<span class="ev__mult">${e.fechas.length} ${es ? "fechas" : "dates"}</span>` : "";
     return `
-    <article class="ev">
+    <article class="ev" tabindex="0" role="button" data-nombre="${e.nombre}" data-uds="${e.uds}" data-fechas="${e.fechas.join(' · ')}" title="${es ? 'Haz clic para solicitar entradas de ' + e.nombre : 'Click to request tickets for ' + e.nombre}">
       <div class="ev__main">
-        <p class="ev__n" title="${e.nombre}">${e.nombre}${etiq}</p>
-        <p class="ev__d" title="${e.fechas.join(" · ")}">${f}</p>
+        <p class="ev__n">${e.nombre}${etiq}</p>
+        <p class="ev__d">${f}</p>
+        <span class="ev__action">${es ? "Pedir este evento →" : "Request this event →"}</span>
       </div>
       <div class="ev__q"><b>${e.uds}</b><span>${es ? "uds" : "qty"}</span></div>
     </article>`;
   }).join("");
+
+  cont.querySelectorAll(".ev").forEach(card => {
+    const solicitarCard = () => {
+      const nom = card.dataset.nombre;
+      const uds = card.dataset.uds;
+      const fechas = card.dataset.fechas;
+      pedirEvento(nom, {
+        unidades: Math.min(Math.max(1, parseInt(uds, 10) || 2), 6),
+        notas: fechas ? (es ? `Interés en fechas disponibles: ${fechas}` : `Interested in available dates: ${fechas}`) : ""
+      });
+    };
+    card.addEventListener("click", solicitarCard);
+    card.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        solicitarCard();
+      }
+    });
+  });
 
   const tot = S.libres.reduce((a,b) => a + b.uds, 0);
   const nf  = S.libres.reduce((a,b) => a + Math.max(1, b.fechas.length), 0);
@@ -1701,12 +1978,111 @@ function pintarPerfil(){
     `<div class="profile__row"><dt>${k}</dt><dd>${v}</dd></div>`).join("");
 }
 
-function pintarTodo(){
-  pintarMetricas(); pintarDisponible(); pintarLineup(); pintarBarras(); pintarPerfil(); pintarTicket();
+/* --- Sincronización en vivo de los tickets con el formulario --- */
+function sincronizarTicketConFormulario(){
+  const evInput = $("#ev"), ciudadInput = $("#ciudad"), fechaInput = $("#fecha"),
+        udsInput = $("#uds"), presuInput = $("#presu");
+  const evVal = evInput ? evInput.value.trim() : "";
+  const ciudadVal = ciudadInput ? ciudadInput.value.trim() : "";
+  const fechaVal = fechaInput ? fechaInput.value : "";
+  const udsVal = udsInput ? udsInput.value : "2";
+  const presuVal = presuInput ? presuInput.value.trim() : "";
+  const es = idioma === "es";
+
+  const tkEventList = [$("#tkEvent"), $("#formTkEvent")].filter(Boolean);
+  const tkVenueList = [$("#tkVenue"), $("#formTkVenue")].filter(Boolean);
+  const tkStatusList = [$("#tkStatus"), $("#formTkStatus")].filter(Boolean);
+  const tkPriceList = [$("#tkPrice"), $("#formTkPrice")].filter(Boolean);
+  const tkBottomStatusList = [$("#tkBottomStatus"), $("#formTkBottomStatus")].filter(Boolean);
+  const tickets = [$("#heroTicket"), $("#formTicket")].filter(Boolean);
+
+  // Nombre de evento
+  const eventTxt = evVal || (es ? "Tu evento" : "Your event");
+  tkEventList.forEach(el => el.textContent = eventTxt);
+  tickets.forEach(tk => {
+    if (evVal) tk.classList.add("ticket--active");
+    else tk.classList.remove("ticket--active");
+  });
+
+  // Recinto / Ciudad / Fecha
+  let venueParts = [];
+  if (ciudadVal) venueParts.push(ciudadVal);
+  if (fechaVal){
+    try {
+      const trozos = fechaVal.split("-");
+      if (trozos.length === 3) venueParts.push(`${trozos[2]}/${trozos[1]}/${trozos[0]}`);
+      else venueParts.push(fechaVal);
+    } catch {
+      venueParts.push(fechaVal);
+    }
+  }
+  const venueTxt = venueParts.length ? venueParts.join(" · ") : (es ? "Agotado en el canal oficial" : "Sold out through official channels");
+  tkVenueList.forEach(el => {
+    el.textContent = venueTxt;
+    el.style.color = venueParts.length ? "var(--paper)" : "";
+  });
+
+  // Precio y unidades
+  const priceTxt = presuVal ? `${udsVal}x · ${presuVal}` : `${udsVal} ${es ? "entradas" : "tickets"}`;
+  tkPriceList.forEach(el => el.textContent = priceTxt);
+
+  // Estado del ticket
+  const statusTxt = evVal ? (es ? "En encargo" : "Sourcing") : (es ? "Localizado" : "Located");
+  tkStatusList.forEach(el => {
+    el.textContent = statusTxt;
+    el.style.color = evVal ? "var(--holo)" : "";
+  });
+
+  const bottomTxt = evVal
+    ? `◆ <span>${es ? "Localizando entradas" : "Locating tickets"}</span>`
+    : `◆ <span>${es ? "Listo para enviar" : "Ready to submit"}</span>`;
+  tkBottomStatusList.forEach(el => el.innerHTML = bottomTxt);
 }
 
-/* --- Carga de las hojas en vivo --- */
+/* --- Petición directa desde marquesina o catálogo --- */
+function pedirEvento(nombre, detalles = {}){
+  const evInput = $("#ev");
+  if (!evInput) return;
+  evInput.value = nombre;
+  if (detalles.unidades && $("#uds")) $("#uds").value = String(detalles.unidades);
+  if (detalles.notas && $("#notas")) $("#notas").value = detalles.notas;
+
+  sincronizarTicketConFormulario();
+
+  const sec = $("#solicitar");
+  if (sec){
+    sec.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  }
+
+  setTimeout(() => {
+    evInput.focus();
+    evInput.classList.add("input--flash");
+    setTimeout(() => evInput.classList.remove("input--flash"), 1300);
+  }, 350);
+}
+
+function pintarTodo(){
+  pintarMetricas(); pintarDisponible(); pintarLineup(); pintarBarras(); pintarPerfil(); pintarTicket(); sincronizarTicketConFormulario();
+}
+
+/* --- Carga de las hojas en vivo con respaldo en caché localStorage --- */
+const CACHE_KEY = "holdtix_sheet_cache_v2";
+
 async function cargarHojas(){
+  // 1. Carga inmediata desde caché para experiencia sin latencia ni parpadeos
+  try{
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached){
+      const obj = JSON.parse(cached);
+      if (obj && obj.entradas){
+        S = { ...obj, fuente: "cache" };
+        pintarTodo();
+      }
+    }
+  }catch(err){
+    console.warn("HoldTix: no se pudo leer caché local", err);
+  }
+
   const lista = (DATOS.hojas || []).filter(x => x.url);
   if (!lista.length) return;
 
@@ -1716,28 +2092,31 @@ async function cargarHojas(){
     console.warn("HoldTix: la página está abierta desde el disco (file://), así que "
       + "el navegador bloquea la lectura de Google Sheets. Es normal. Súbela a tu "
       + "hosting, o pruébala en local con:  python3 -m http.server 8000  y abre "
-      + "http://localhost:8000  Mientras tanto se muestran las cifras fijas.");
-    return;
-  }
-
-  const res = await Promise.allSettled(lista.map(async x => {
-    const r = await fetch(x.url, { cache:"no-store" });
-    if (!r.ok) throw new Error(x.nombre + ": HTTP " + r.status);
-    return { nombre: x.nombre, filas: parseCSV(await r.text()) };
-  }));
-
-  res.filter(r => r.status === "rejected")
-     .forEach(r => console.warn("HoldTix:", r.reason));
-  const ok = res.filter(r => r.status === "fulfilled").map(r => r.value);
-  if (!ok.length){
-    console.warn("HoldTix: ninguna hoja respondio; se usan los datos de respaldo.");
+      + "http://localhost:8000  Mientras tanto se muestran las cifras cacheadas o fijas.");
     return;
   }
 
   try{
+    const res = await Promise.allSettled(lista.map(async x => {
+      const r = await fetch(x.url, { cache:"no-store" });
+      if (!r.ok) throw new Error(x.nombre + ": HTTP " + r.status);
+      return { nombre: x.nombre, filas: parseCSV(await r.text()) };
+    }));
+
+    res.filter(r => r.status === "rejected")
+       .forEach(r => console.warn("HoldTix:", r.reason));
+    const ok = res.filter(r => r.status === "fulfilled").map(r => r.value);
+    if (!ok.length){
+      console.warn("HoldTix: ninguna hoja respondió; se usan los datos de respaldo.");
+      return;
+    }
+
     S = calcular(ok.flatMap(x => x.filas));
     S.hojas = ok.map(x => x.nombre);
-    console.info("HoldTix: leidas [" + S.hojas.join(", ") + "] -> "
+    try{
+      localStorage.setItem(CACHE_KEY, JSON.stringify(S));
+    }catch(e){}
+    console.info("HoldTix: leídas [" + S.hojas.join(", ") + "] -> "
                  + S.lotes + " operaciones, " + S.entradas + " entradas.");
     pintarTodo();
   }catch(e){
@@ -1764,29 +2143,40 @@ function contar(el){
   })(t0);
 }
 
-/* --- Entrada del hero: marcador de temporada --- */
+/* --- Marcador de temporada en los tickets --- */
 function pintarTicket(){
-  $("#tkSerial").textContent = "HTX-" + String(1000 + (S.lotes % 9000));
+  const serial = "HTX-" + String(1000 + (S.lotes % 9000));
+  const t1 = $("#tkSerial"), t2 = $("#formTkSerial");
+  if (t1) t1.textContent = serial;
+  if (t2) t2.textContent = serial;
 }
 
 (function barcode(){
-  const bc = $("#barcode");
-  for (let i = 0; i < 46; i++){
-    const b = document.createElement("i");
-    b.style.height = (10 + Math.random() * 24) + "px";
-    b.style.width  = (Math.random() > .72 ? 3 : 2) + "px";
-    bc.appendChild(b);
-  }
-  const tk = $("#heroTicket");
-  if (reduce || !matchMedia("(pointer:fine)").matches) return;
-  const wrap = tk.parentElement;
-  wrap.addEventListener("mousemove", e => {
-    const r = wrap.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width - .5;
-    const y = (e.clientY - r.top) / r.height - .5;
-    tk.style.transform = `rotateY(${x * 9}deg) rotateX(${-y * 9}deg) translateZ(14px)`;
+  const bcs = [$("#barcode"), $("#formBarcode")].filter(Boolean);
+  bcs.forEach(bc => {
+    bc.innerHTML = "";
+    for (let i = 0; i < 46; i++){
+      const b = document.createElement("i");
+      b.style.height = (10 + Math.random() * 24) + "px";
+      b.style.width  = (Math.random() > .72 ? 3 : 2) + "px";
+      bc.appendChild(b);
+    }
   });
-  wrap.addEventListener("mouseleave", () => tk.style.transform = "");
+
+  if (reduce || !matchMedia("(pointer:fine)").matches) return;
+  [
+    { wrap: $("#heroTicket")?.parentElement, tk: $("#heroTicket") },
+    { wrap: $("#formTicket")?.parentElement, tk: $("#formTicket") }
+  ].forEach(({ wrap, tk }) => {
+    if (!wrap || !tk) return;
+    wrap.addEventListener("mousemove", e => {
+      const r = wrap.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - .5;
+      const y = (e.clientY - r.top) / r.height - .5;
+      tk.style.transform = `rotateY(${x * 9}deg) rotateX(${-y * 9}deg) translateZ(14px)`;
+    });
+    wrap.addEventListener("mouseleave", () => tk.style.transform = "");
+  });
 })();
 
 /* --- Revelado al hacer scroll --- */
@@ -2041,9 +2431,20 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape" && modalOverlay.classList.contains("open")) cerrarModalLegal();
 });
 
-/* --- Arranque --- */
+/* --- Arranque y Conexión de Formulario --- */
 $("#yr").textContent = new Date().getFullYear();
 if (MOVIMIENTO_SIEMPRE) document.documentElement.classList.add("mov-siempre");
+
+["ev", "ciudad", "fecha", "uds", "presu"].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener("input", sincronizarTicketConFormulario);
+    el.addEventListener("change", sincronizarTicketConFormulario);
+  }
+});
+const rf = $("#reqForm");
+if (rf) rf.addEventListener("reset", () => setTimeout(sincronizarTicketConFormulario, 20));
+
 aplicarIdioma(IDIOMA_INICIAL);
 observarRevelado();
 cargarHojas();
